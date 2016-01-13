@@ -11,11 +11,14 @@ SOURCES += main.cpp \
     server.cpp \
     connection.cpp \
     channel.cpp \
-    listener.cpp
+    listener.cpp \
+    message.cpp \
+    socketmanager.cpp
 
 HEADERS += \
     server.h \
     connection.h \
     channel.h \
-    listener.h
-
+    listener.h \
+    message.h \
+    socketmanager.h
