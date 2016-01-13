@@ -1,6 +1,6 @@
 #include "channel.h"
 
-Channel::Channel()
+Channel::Channel(QObject *parent) : QObject(parent)
 {
 
 }
