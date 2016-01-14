@@ -4,8 +4,6 @@
 #include "server.h"
 #include "listener.h"
 
-#define SERVER_PORT 3333
-
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);

@@ -1,6 +1,8 @@
 #ifndef SERVER_H
 #define SERVER_H
 
+#define MAX_CONNECTIONS 200
+
 #include <vector>
 #include <string>
 #include <QObject>
@@ -28,9 +30,12 @@ public slots:
     void removeConnection(Connection *connection);
 
 private:
+    Connection *activeConnections[MAX_CONNECTIONS];
     vector<Connection *>  active_connection;
-    vector<Channel *> static_channels;
-    vector<Channel *> dynamic_channels;
+    vector<Channel *> public_channels;
+    vector<Channel *> private_channels;
+
+    int GetFreePortNumber();
 };
 
 #endif // SERVER_H

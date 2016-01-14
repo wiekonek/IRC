@@ -22,3 +22,6 @@ HEADERS += \
     listener.h \
     message.h \
     socketmanager.h
+
+QMAKE_CXXFLAGS += -std=c++0x -pthread
+LIBS += -pthread

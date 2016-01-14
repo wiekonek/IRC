@@ -15,6 +15,8 @@ class Listener : public QObject
     Q_OBJECT
 public:
     Listener(QObject *parent = 0);
+    void SetListening(bool isActive);
+
 
 signals:
     void onNewConnection(Connection *);
@@ -23,9 +25,14 @@ public slots:
 
 private:
     struct sockaddr_in address;
+    int listenerSocket = 0;
+    bool Listen = true;
+
+    ~Listener();
 
     bool IsLoginMessage(Message &message);
     bool IsRequestMessage(Message &message);
+    void ListenerLoop();
 };
 
 #endif // LISTENER_H
