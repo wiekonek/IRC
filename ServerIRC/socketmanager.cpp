@@ -16,7 +16,7 @@ int SocketManager::CreateSocket(sockaddr_in &address, int queueSize)
     if (socketNumber < 0)
     {
         fprintf(stderr, "Can't create a socket.\n");
-        exit(1);
+        return -1;
     }
     setsockopt(socketNumber, SOL_SOCKET, SO_REUSEADDR, (char*)&opt, sizeof(opt));
 
@@ -24,16 +24,38 @@ int SocketManager::CreateSocket(sockaddr_in &address, int queueSize)
     if (bindErr < 0)
     {
         fprintf(stderr, "Can't bind a name to a socket.\n");
-        exit(1);
+        return -1;
     }
 
     int listenErr = listen(socketNumber, queueSize);
     if (listenErr < 0)
     {
         fprintf(stderr, "Can't set queue size.\n");
+        return -1;
     }
 
     return socketNumber;
+}
+
+int SocketManager::Accept(sockaddr_in &clientAddress, int listenerSocket)
+{
+    socklen_t nTmp = sizeof(struct sockaddr);
+    int clientSocket = accept(listenerSocket, (struct sockaddr*)&clientAddress, &nTmp);
+    if (clientSocket < 0)
+    {
+       qDebug() << "Can't create a connection's socket.";
+       return -1;
+    }
+
+    return clientSocket;
+}
+
+void SocketManager::Write(int destinationSocket, const char *message, int buffSize)
+{
+    char buffer[buffSize];
+    int n;
+    n = sprintf(buffer, message);
+    write(destinationSocket, buffer, n);
 }
 
 

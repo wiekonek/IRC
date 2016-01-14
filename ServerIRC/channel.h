@@ -12,6 +12,9 @@ public:
 signals:
 
 public slots:
+private:
+    int port;
+    char *name;
 };
 
 #endif // CHANNEL_H

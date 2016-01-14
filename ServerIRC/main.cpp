@@ -11,8 +11,6 @@
 #include <QJsonParseError>
 #include <QFile>
 
-#define SERVER_PORT 3333
-
 void messageusage();
 
 int main(int argc, char *argv[])

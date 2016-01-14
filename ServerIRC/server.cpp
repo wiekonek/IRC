@@ -11,7 +11,7 @@ Server::Server(QObject *parent) : QObject(parent)
 
 void Server::addChannel(Channel *channel)
 {
-    dynamic_channels.push_back(channel);
+    private_channels.push_back(channel);
     cout<<"New channel created.";
 }
 
@@ -22,17 +22,30 @@ template<class T> void Erase(vector<T*> &vec, T *item) {
 
 void Server::removeChannel(Channel *channel)
 {
-    Erase(dynamic_channels, channel);
+    Erase(private_channels, channel);
 }
 
 void Server::addConnection(Connection *connection)
 {
-    active_connection.push_back(connection);
+    int freePort = GetFreePortNumber();
+    activeConnections[freePort] = connection;
+    connection->SetPort(freePort);
     cout<<"New connection established.\n";
 }
 
 void Server::removeConnection(Connection *connection)
 {
-    Erase(active_connection, connection);
+    for(int i = 0; i < MAX_CONNECTIONS; i++) {
+        if(activeConnections[i] == connection)
+            delete activeConnections[i];
+    }
 }
 
+int Server::GetFreePortNumber()
+{
+    for(int i = 0; i < MAX_CONNECTIONS; i++) {
+        if(activeConnections[i] == NULL)
+            return i;
+    }
+    return -1;
+}
