@@ -6,23 +6,28 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
+#include <QJsonParseError>
 #include <QFile>
 
 class Message
 {
 public:
     Message();
+    Message(char* json);
+
     void add(QString key, QString value);
-    QString getValue(QString key);
+    void add(QString key, int value);
+
     QByteArray toByte();
     char* toChar();
+
+    QString getValue(QString key);
     void printAll();
 
     struct sockaddr_in addres;
 
 private:
     QJsonObject *container;
-
 
 };
 
