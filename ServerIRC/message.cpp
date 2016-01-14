@@ -56,13 +56,3 @@ void Message::printAll()
 {
     qDebug("%s", toChar());
 }
-
-
-/*qDebug("%d", toByte().size());
-QByteArray array = toByte();
-char* data = array.data();
-QByteArray *json_array = new QByteArray(data);
-QJsonDocument *doc = new QJsonDocument();
-QJsonParseError *error = new QJsonParseError();
-QJsonDocument ret_doc = doc->fromJson(*json_array, error);
-qDebug(ret_doc.toJson());*/

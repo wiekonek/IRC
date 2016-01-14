@@ -4,13 +4,6 @@
 #include "server.h"
 #include "listener.h"
 
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QJsonValue>
-#include <QJsonParseError>
-#include <QFile>
-
 void messageusage();
 
 int main(int argc, char *argv[])

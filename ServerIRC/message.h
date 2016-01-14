@@ -24,8 +24,6 @@ public:
     QString getValue(QString key);
     void printAll();
 
-    struct sockaddr_in addres;
-
 private:
     QJsonObject *container;
 
