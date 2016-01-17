@@ -13,8 +13,20 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainclientwindow.cpp
+        mainclientwindow.cpp \
+    pickserverdialog.cpp \
+    client.cpp \
+    connection.cpp \
+    logindialog.cpp \
+    message.cpp
 
-HEADERS  += mainclientwindow.h
+HEADERS  += mainclientwindow.h \
+    pickserverdialog.h \
+    client.h \
+    connection.h \
+    logindialog.h \
+    message.h
 
-FORMS    += mainclientwindow.ui
+FORMS    += mainclientwindow.ui \
+    pickserverdialog.ui \
+    logindialog.ui
