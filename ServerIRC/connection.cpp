@@ -1,21 +1,17 @@
 #include "connection.h"
-
-#include <pthread.h>
-#include <sstream>
 #include <server.h>
-#include <signal.h>
 
 Connection::Connection(QObject *parent) : QObject(parent) { }
 
 Connection::Connection(int clientSocket, sockaddr_in address)
 {
     this->clientSocket = clientSocket;
+    this->working = true;
     SocketManager::Write(clientSocket, "Connection slot granted.\n", 50);
     std::string str = "NEW_PORT" + std::to_string(port);
     SocketManager::Write(clientSocket, str.c_str(), 40);
 
     pthread_create(&id, NULL, &Connection::handle, this);
-
 }
 
 Connection::~Connection()
@@ -23,9 +19,47 @@ Connection::~Connection()
     SocketManager::Write(clientSocket, "EXIT", 10);
 }
 
+bool Connection::isWorking()
+{
+    return working;
+}
+
+int Connection::getMessageCount()
+{
+    //throw new std::exception("get message count not implemented");
+    return 0;
+}
+
 void Connection::SetPort(int port)
 {
     this->port = port;
+}
+
+void Connection::Disconnect()
+{
+    working = false;
+}
+
+void Connection::Send(Message *messsage)
+{
+    qDebug("XD");
+}
+
+void Connection::analyze(char *transmission, int size)
+{
+    int start = 0;
+    for(int i = 0; i<size; i++)
+    {
+        if(isEndOfMessage(transmission[i]))
+        {
+            int end = i;
+            char temp[BUF_SIZE];
+            strncpy(temp, transmission + start, end);
+            start = i;
+        }
+        if(isEndOfBuffor(transmission[i]))
+            break;
+    }
 }
 
 void* Connection::handle(void *arg)
@@ -35,17 +69,14 @@ void* Connection::handle(void *arg)
 
 void* Connection::loop()
 {
-    struct timeval timeout;
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 500;
-
-    if (signal(SIGPIPE, Connection::sigpipe_handler) == SIG_ERR) {
-      qDebug("cant catch SIGPIPE");
-      perror(0);
-      exit(1);
+    if (signal(SIGPIPE, Connection::sigpipeHandler) == SIG_ERR)
+    {
+        qDebug("cant catch SIGPIPE");
+        perror(0);
+        exit(1);
     }
 
-    while(true)
+    while(working)
     {
         int size = SocketManager::Write(this->clientSocket, "XD", 50);
 
@@ -57,18 +88,28 @@ void* Connection::loop()
         if(recv_size > 0)
         {
             qDebug("message from client appear!");
-            qDebug("%s", buf);
+            analyze(buf, BUF_SIZE);
         }
 
         sleep(1);
     }
-
+    qDebug("disconnected");
     close(clientSocket);
     Server::getInstance().removeConnection(this);
-    delete(this);
+    working = false;
 }
 
-void Connection::sigpipe_handler(int signo)
+bool Connection::isEndOfBuffor(char *sign)
+{
+    return sign[0] == '\0';
+}
+
+bool Connection::isEndOfMessage(char *sign)
+{
+    return sign[0] == '\4';
+}
+
+void Connection::sigpipeHandler(int signo)
 {
     if (signo == SIGPIPE)
     {
