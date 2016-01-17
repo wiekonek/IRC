@@ -50,12 +50,18 @@ int SocketManager::Accept(sockaddr_in &clientAddress, int listenerSocket)
     return clientSocket;
 }
 
-void SocketManager::Write(int destinationSocket, const char *message, int buffSize)
+int SocketManager::Write(int destinationSocket, const char *message, int buffSize)
 {
     char buffer[buffSize];
     int n;
     n = sprintf(buffer, message);
-    write(destinationSocket, buffer, n);
+    int size = write(destinationSocket, buffer, n);
+    return size;
 }
 
+
+int SocketManager::ReadNoWait(int destinationSocket, char *message, int buffSize)
+{
+    return recv(destinationSocket, message, buffSize, MSG_DONTWAIT);
+}
 

@@ -1,6 +1,8 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
+#define BUF_SIZE 2000
+
 #include <QObject>
 #include "message.h"
 
@@ -28,8 +30,12 @@ private:
     int clientSocket;
     int port;
     struct sockaddr_in address;
+    pthread_t id;
 
-    void ConnectionHandler();
+    static void* handle(void *arg);
+    void* loop();
+
+    static void sigpipe_handler(int signo);
 
 };
 

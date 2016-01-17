@@ -18,7 +18,8 @@ public:
     static void SetupSockaddr(struct sockaddr_in &address, int portNumber);
     static int CreateSocket(struct sockaddr_in &address, int queueSize);
     static int Accept(struct sockaddr_in &clientAddress, int listenerSocket);
-    static void Write(int destinationSocket, const char *message, int buffSize);
+    static int Write(int destinationSocket, const char *message, int buffSize);
+    static int ReadNoWait(int destinationSocket, char *message, int buffSize);
 };
 
 #endif // SOCKETMANAGER_H

@@ -9,6 +9,12 @@ Server::Server(QObject *parent) : QObject(parent)
 
 }
 
+Server& Server::getInstance() // statyczna klasa signleton
+{
+    static Server instance;
+    return instance;
+}
+
 void Server::addChannel(Channel *channel)
 {
     private_channels.push_back(channel);

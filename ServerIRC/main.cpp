@@ -10,14 +10,15 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    if(argc < 2)
-    {
-        qDebug("Please specify IP adress.\n");
-        return a.exec();
-    }
+//    if(argc < 2)
+//    {
+//       qDebug("Please specify IP adress.\n");
+//        return a.exec();
+//    }
 
-    Server* server = new Server();
-    Listener* listener = new Listener();
+    Server* server = &(Server::getInstance());
+
+    Listener* listener = new Listener(); // proponuje tez zmienic na singletona
 
     qDebug("Connecting QT signals...");
     QObject::connect(listener, SIGNAL(onNewConnection(Connection*)),
