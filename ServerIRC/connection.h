@@ -8,6 +8,7 @@
 #include <sstream>
 #include <signal.h>
 #include <queue>
+#include <QDebug>
 
 #include "message.h"
 
@@ -16,38 +17,35 @@ class Connection : public QObject
     Q_OBJECT
 public:
     Connection(QObject *parent = 0);
-    Connection(int clientSocket, struct sockaddr_in address);
+    Connection(int clientSocket);
     ~Connection();
 
-    bool isWorking();
-    int getMessageCount();
-
-
+    bool IsWorking();
     void Close();
     void SetPort(int port);
     void Disconnect();
+    void Send(Message* message);
 
 signals:
     void OnRegisterToChannel(Connection *connection);
     void OnNewMessage(Message *message);
 
-public slots:
-    void Send(Message *message);
-
 private:
     bool working;
+    bool tosend;
+    int client_socket;
     QString client_name;
-    int clientSocket;
+    std::queue<Message *> *output_messages;
+
     int port;
     pthread_t id;
-    std::queue<Message *> output_messages;
+    pthread_mutex_t queue_mutex;
 
-    void* loop();
-    static void analyze(char* buf, int size);
-    static void* handle(void *arg);
+    void* mainLoop();
+    void analyze(char* buf);
+    int sendManage();
+    static void* connect2Thread(void *arg);
     static void sigpipeHandler(int signo);
-    static bool isEndOfMessage(char* sign);
-    static bool isEndOfBuffor(char* sign);
 
 };
 

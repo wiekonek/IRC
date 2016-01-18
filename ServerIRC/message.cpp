@@ -6,7 +6,7 @@ Message::Message()
     container = new QJsonObject();
 }
 
-Message::Message(char* json)
+Message::Message(const char* json)
 {
     QByteArray *byte_array = new QByteArray(json);
 

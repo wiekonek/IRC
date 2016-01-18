@@ -3,31 +3,26 @@
 
 Connection::Connection(QObject *parent) : QObject(parent) { }
 
-Connection::Connection(int clientSocket, sockaddr_in address)
+Connection::Connection(int client_socket)
 {
-    this->clientSocket = clientSocket;
+    output_messages = new std::queue<Message *>();
+    queue_mutex = PTHREAD_MUTEX_INITIALIZER;
+    this->client_socket = client_socket;
     this->working = true;
-    SocketManager::Write(clientSocket, "Connection slot granted.\n", 50);
-    std::string str = "NEW_PORT" + std::to_string(port);
-    SocketManager::Write(clientSocket, str.c_str(), 40);
+    this->tosend = false;
+    SocketManager::Write(client_socket, "Connection slot granted.\n", 50);
 
-    pthread_create(&id, NULL, &Connection::handle, this);
+    pthread_create(&id, NULL, &Connection::connect2Thread, this);
 }
 
 Connection::~Connection()
 {
-    SocketManager::Write(clientSocket, "EXIT", 10);
+    SocketManager::Write(client_socket, "EXIT", 10);
 }
 
-bool Connection::isWorking()
+bool Connection::IsWorking()
 {
     return working;
-}
-
-int Connection::getMessageCount()
-{
-    //throw new std::exception("get message count not implemented");
-    return 0;
 }
 
 void Connection::SetPort(int port)
@@ -42,33 +37,17 @@ void Connection::Disconnect()
 
 void Connection::Send(Message *messsage)
 {
-    qDebug("XD");
+    pthread_mutex_lock(&queue_mutex);
+    output_messages->push(messsage);
+    tosend = true;
+    pthread_mutex_unlock(&queue_mutex);
 }
 
-void Connection::analyze(char *transmission, int size)
+void* Connection::mainLoop()
 {
-    int start = 0;
-    for(int i = 0; i<size; i++)
-    {
-        if(isEndOfMessage(transmission[i]))
-        {
-            int end = i;
-            char temp[BUF_SIZE];
-            strncpy(temp, transmission + start, end);
-            start = i;
-        }
-        if(isEndOfBuffor(transmission[i]))
-            break;
-    }
-}
+    QObject::connect(this, SIGNAL(OnNewMessage(Message*)),
+                     Server::getInstance(), SLOT(readMessage(Message*)));
 
-void* Connection::handle(void *arg)
-{
-    return ((Connection*)arg)->loop();
-}
-
-void* Connection::loop()
-{
     if (signal(SIGPIPE, Connection::sigpipeHandler) == SIG_ERR)
     {
         qDebug("cant catch SIGPIPE");
@@ -78,35 +57,73 @@ void* Connection::loop()
 
     while(working)
     {
-        int size = SocketManager::Write(this->clientSocket, "XD", 50);
-
+        int size = sendManage();
+        size = SocketManager::Write(client_socket, "\4", 10);
         if(size < 0)
             break;
 
         char buf[BUF_SIZE];
-        int recv_size = SocketManager::ReadNoWait(clientSocket, buf, BUF_SIZE);
+        int recv_size = SocketManager::ReadNoWait(client_socket, buf, BUF_SIZE);
         if(recv_size > 0)
         {
-            qDebug("message from client appear!");
-            analyze(buf, BUF_SIZE);
+            analyze(buf);
         }
 
-        sleep(1);
+        usleep(200000);
     }
     qDebug("disconnected");
-    close(clientSocket);
-    Server::getInstance().removeConnection(this);
+    close(client_socket);
+    Server::getInstance()->removeConnection(this);
     working = false;
+    return 0;
 }
 
-bool Connection::isEndOfBuffor(char *sign)
+void Connection::analyze(char *transmission)
 {
-    return sign[0] == '\0';
+    QString* buffer = new QString(transmission);
+    QStringList messages = buffer->split('\4');
+    for(int i=0; i<messages.size(); i++)
+    {
+        if(messages[i] != "")
+        {
+            Message* message = new Message((messages[i]).toStdString().c_str());
+            emit OnNewMessage(message);
+        }
+    }
 }
 
-bool Connection::isEndOfMessage(char *sign)
+int Connection::sendManage()
 {
-    return sign[0] == '\4';
+    if(tosend)
+    {
+        std::queue<Message *> *bufor = new std::queue<Message *>();
+        pthread_mutex_lock(&queue_mutex);
+        while(output_messages->size() > 0)
+        {
+            bufor->push(output_messages->front());
+            output_messages->pop();
+        }
+        tosend = false;
+        pthread_mutex_unlock(&queue_mutex);
+
+        int size = 0;
+        while(bufor->size() > 0)
+        {
+            Message* message = bufor->front();
+            bufor->pop();
+            size = SocketManager::Write(client_socket, message->toChar(), BUF_SIZE);
+            if(size < 0)
+                break;
+        }
+        delete(bufor);
+        return size;
+    }
+    return 0;
+}
+
+void* Connection::connect2Thread(void *arg)
+{
+    return ((Connection*)arg)->mainLoop();
 }
 
 void Connection::sigpipeHandler(int signo)

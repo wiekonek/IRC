@@ -16,9 +16,8 @@ int main(int argc, char *argv[])
 //        return a.exec();
 //    }
 
-    Server* server = &(Server::getInstance());
-
-    Listener* listener = new Listener(); // proponuje tez zmienic na singletona
+    Server* server = Server::getInstance();
+    Listener* listener = Listener::GetInstance();
 
     qDebug("Connecting QT signals...");
     QObject::connect(listener, SIGNAL(onNewConnection(Connection*)),
@@ -43,9 +42,9 @@ void messageusage()
     Message *json_in = new Message(raw_message); //tworzymy jsona z otrzymanej wiadomosci
     json_in->printAll();
     QString value = json_in->getValue("channel");
-    qDebug(qPrintable(value));
+    //qDebug(qPrintable(value));
     value = json_in->getValue("text");
-    qDebug(qPrintable(value));
+    //qDebug(qPrintable(value));
 }
 
 

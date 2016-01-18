@@ -54,7 +54,7 @@ int SocketManager::Write(int destinationSocket, const char *message, int buffSiz
 {
     char buffer[buffSize];
     int n;
-    n = sprintf(buffer, message);
+    n = sprintf(buffer, "%s", message);
     int size = write(destinationSocket, buffer, n);
     return size;
 }

@@ -19,8 +19,8 @@ class Server : public QObject
 
 public:
      Server(QObject* parent=0);
-     static Server& getInstance();
-
+     static Server* getInstance();
+     vector<Connection *>  active_connection;
 signals:
 
 public slots:
@@ -30,9 +30,11 @@ public slots:
     void addConnection(Connection *connection);
     void removeConnection(Connection *connection);
 
+    void readMessage(Message *message);
+
 private:
     Connection *activeConnections[MAX_CONNECTIONS];
-    vector<Connection *>  active_connection;
+
     vector<Channel *> public_channels;
     vector<Channel *> private_channels;
 

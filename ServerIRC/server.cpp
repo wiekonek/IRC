@@ -9,10 +9,10 @@ Server::Server(QObject *parent) : QObject(parent)
 
 }
 
-Server& Server::getInstance() // statyczna klasa signleton
+Server* Server::getInstance() // statyczna klasa signleton
 {
     static Server instance;
-    return instance;
+    return &instance;
 }
 
 void Server::addChannel(Channel *channel)
@@ -33,9 +33,7 @@ void Server::removeChannel(Channel *channel)
 
 void Server::addConnection(Connection *connection)
 {
-    int freePort = GetFreePortNumber();
-    activeConnections[freePort] = connection;
-    connection->SetPort(freePort);
+    active_connection.push_back(connection);
     cout<<"New connection established.\n";
 }
 
@@ -54,4 +52,9 @@ int Server::GetFreePortNumber()
             return i;
     }
     return -1;
+}
+
+void Server::readMessage(Message* message)
+{
+    message->printAll();
 }
