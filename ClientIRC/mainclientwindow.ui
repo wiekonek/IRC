@@ -2,24 +2,91 @@
 <ui version="4.0">
  <class>MainClientWindow</class>
  <widget class="QMainWindow" name="MainClientWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>644</width>
+    <width>670</width>
     <height>392</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>MainClientWindow</string>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
-  <widget class="QWidget" name="centralWidget"/>
+  <property name="windowTitle">
+   <string>IRC Client</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QTabWidget" name="chatWindow">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>475</width>
+      <height>255</height>
+     </rect>
+    </property>
+    <property name="tabsClosable">
+     <bool>false</bool>
+    </property>
+    <property name="movable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="chatWindowPage1" native="true">
+     <attribute name="title">
+      <string/>
+     </attribute>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>300</y>
+      <width>471</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLineEdit" name="lineEdit_message"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="button_send">
+       <property name="text">
+        <string>Send</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QListView" name="listView_channelUsers">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>20</y>
+      <width>161</width>
+      <height>251</height>
+     </rect>
+    </property>
+   </widget>
+   <zorder>chatWindow</zorder>
+   <zorder>horizontalLayoutWidget</zorder>
+   <zorder>listView_channelUsers</zorder>
+   <zorder>lineEdit_message</zorder>
+  </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>644</width>
+     <width>670</width>
      <height>25</height>
     </rect>
    </property>
