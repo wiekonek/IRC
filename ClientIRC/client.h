@@ -5,6 +5,7 @@
 
 #include "pickserverdialog.h"
 #include "logindialog.h"
+#include "mainclientwindow.h"
 
 class Client : public QObject
 {
@@ -20,7 +21,7 @@ public slots:
     void Disconnect();
     void Cleanup();
     void LoggedIn(IRCData::UserData *userData);
-    void NewMessageReceived(Message *message);
+    void MessageReceived(Message *message);
 
 private:
     Connection *connection;

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "message.h"
+#include "datastructures.h"
 
 class Connection : public QObject
 {
@@ -15,6 +16,7 @@ signals:
     void OnConnectionLost();
 
 public slots:
+    void SendMessage(IRCData::MessageData *message);
 
 private:
     void ConnectionLoop();

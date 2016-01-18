@@ -2,17 +2,10 @@
 #define LOGINDIALOG_H
 
 #include <QWidget>
+#include "datastructures.h"
 
 namespace Ui {
 class LoginDialog;
-}
-
-namespace IRCData {
-    typedef struct userData {
-        QString username;
-        QString password;
-        QString perrmission; // ??
-    } UserData;
 }
 
 class LoginDialog : public QWidget

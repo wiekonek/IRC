@@ -14,10 +14,16 @@ LoginDialog::~LoginDialog()
 }
 void LoginDialog::on_button_login_clicked()
 {
-
+// TODO zalogowac sieeeee
+    IRCData::UserData *userData = new IRCData::UserData();
+    userData->username = "admin";
+    userData->perrmission = "a";
+    emit OnLoggedIn(userData);
+    this->close();
 }
 
 void LoginDialog::on_button_quit_clicked()
 {
-
+    emit OnClose();
+    this->close();
 }

@@ -1,5 +1,7 @@
 #include "client.h"
 
+#include <QDebug>
+
 Client::Client(QObject *parent) : QObject(parent)
 {
     PickServerDialog *pickServer = new PickServerDialog();
@@ -26,12 +28,13 @@ void Client::Connect(Connection *connection)
     this->connection = connection;
 
 
-    QObject::connect(connection, SIGNAL(OnNewMessageReceived(Message*)),
-                     this, SLOT(NewMessageReceived(Message*)));
+    QObject::connect(connection, SIGNAL(OnMessageReceived(Message*)),
+                     this, SLOT(MessageReceived(Message*)));
     QObject::connect(connection, SIGNAL(OnConnectionLost()),
                      this, SLOT(Disconnect()));
 
     LoginDialog *loginDialog = new LoginDialog();
+    loginDialog->show();
 
     QObject::connect(loginDialog, SIGNAL(OnLoggedIn(IRCData::UserData*)),
                      this, SLOT(LoggedIn(IRCData::UserData*)));
@@ -53,11 +56,17 @@ void Client::Cleanup()
 
 void Client::LoggedIn(IRCData::UserData *userData)
 {
-    // TODO
-    qDebug("Logged in.");
+    this->userData = userData;
+    qDebug() << "Logged in as:" << userData->username;
+
+    MainClientWindow *mainWindow = new MainClientWindow();
+    mainWindow->show();
+
+    QObject::connect(mainWindow, SIGNAL(OnSendMessage(IRCData::MessageData*)),
+                     connection, SLOT(SendMessage(IRCData::MessageData*)));
 }
 
-void Client::NewMessageReceived(Message *message)
+void Client::MessageReceived(Message *message)
 {
     // TODO
 }

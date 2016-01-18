@@ -6,9 +6,9 @@ PickServerDialog::PickServerDialog(QWidget *parent) :
     ui(new Ui::PickServerDialog)
 {
     ui->setupUi(this);
-    ip = "";
-    port = "";
-    ui->button_connect->setEnabled(false);
+    ip = ui->lineEdit_ip->text();
+    port = ui->lineEdit_port->text();
+    SetupButton();
     ui->lineEdit_port->setValidator( new QIntValidator(100, 60000, this));
 }
 
@@ -39,7 +39,7 @@ void PickServerDialog::SetupButton()
 
 bool PickServerDialog::TryConnect(const char *ipNumber, int portNumber)
 {
-    // TODO, it should return true if client can connect to that ip and port.
+    // TODO return true if client can connect to that ip and port.
     // It should also setup establishedConnection
     establishedConnection = new Connection();
     return true;

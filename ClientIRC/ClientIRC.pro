@@ -18,15 +18,21 @@ SOURCES += main.cpp\
     client.cpp \
     connection.cpp \
     logindialog.cpp \
-    message.cpp
+    message.cpp \
+    chatwidget.cpp
 
 HEADERS  += mainclientwindow.h \
     pickserverdialog.h \
     client.h \
     connection.h \
     logindialog.h \
-    message.h
+    message.h \
+    chatwidget.h \
+    datastructures.h
 
 FORMS    += mainclientwindow.ui \
     pickserverdialog.ui \
-    logindialog.ui
+    logindialog.ui \
+    chatwidget.ui
+
+DISTFILES +=

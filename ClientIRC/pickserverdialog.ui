@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>509</width>
-    <height>139</height>
+    <width>400</width>
+    <height>140</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,47 +16,21 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <widget class="QPushButton" name="button_quit">
-   <property name="geometry">
-    <rect>
-     <x>390</x>
-     <y>100</y>
-     <width>99</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Quit</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="button_connect">
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>100</y>
-     <width>99</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Connect</string>
-   </property>
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
-  </widget>
   <widget class="QWidget" name="gridLayoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>481</width>
+     <width>381</width>
      <height>80</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="1">
      <widget class="QLineEdit" name="lineEdit_ip">
+      <property name="text">
+       <string>localhost</string>
+      </property>
       <property name="maxLength">
        <number>15</number>
       </property>
@@ -80,6 +54,9 @@
       <property name="inputMethodHints">
        <set>Qt::ImhDigitsOnly</set>
       </property>
+      <property name="text">
+       <string>9999</string>
+      </property>
       <property name="clearButtonEnabled">
        <bool>true</bool>
       </property>
@@ -89,6 +66,35 @@
      <widget class="QLabel" name="label">
       <property name="text">
        <string>Server ip:</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>100</y>
+     <width>181</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QPushButton" name="button_quit">
+      <property name="text">
+       <string>Quit</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="button_connect">
+      <property name="text">
+       <string>Connect</string>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
       </property>
      </widget>
     </item>
