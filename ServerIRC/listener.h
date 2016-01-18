@@ -16,6 +16,7 @@ class Listener : public QObject
 public:
     Listener(QObject *parent = 0);
     void SetListening(bool isActive);
+    static Listener* GetInstance();
 
 
 signals:
@@ -27,12 +28,14 @@ private:
     struct sockaddr_in address;
     int listenerSocket = 0;
     bool Listen = true;
+    pthread_t id;
 
     ~Listener();
 
     bool IsLoginMessage(Message &message);
     bool IsRequestMessage(Message &message);
-    void ListenerLoop();
+    void* ListenerLoop();
+    static void* Connect2Thread(void *arg);
 };
 
 #endif // LISTENER_H

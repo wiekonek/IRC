@@ -16,9 +16,8 @@ int main(int argc, char *argv[])
 //        return a.exec();
 //    }
 
-    Server* server = &(Server::getInstance());
-
-    Listener* listener = new Listener(); // proponuje tez zmienic na singletona
+    Server* server = Server::getInstance();
+    Listener* listener = Listener::GetInstance();
 
     qDebug("Connecting QT signals...");
     QObject::connect(listener, SIGNAL(onNewConnection(Connection*)),

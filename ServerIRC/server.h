@@ -19,7 +19,7 @@ class Server : public QObject
 
 public:
      Server(QObject* parent=0);
-     static Server& getInstance();
+     static Server* getInstance();
 
 signals:
 

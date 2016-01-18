@@ -9,7 +9,13 @@ Listener::Listener(QObject *parent) : QObject(parent)
     listenerSocket = SocketManager::CreateSocket(address, LISTENER_QUEUE_SIZE);
     qDebug("Listener socket working.");
 
-    ListenerLoop();
+    pthread_create(&id, NULL, &Listener::Connect2Thread, this);
+}
+
+Listener* Listener::GetInstance()
+{
+    static Listener singleton;
+    return &singleton;
 }
 
 void Listener::SetListening(bool isActive)
@@ -22,7 +28,7 @@ Listener::~Listener()
     close(listenerSocket);
 }
 
-void Listener::ListenerLoop()
+void* Listener::ListenerLoop()
 {
     struct sockaddr_in clientAddress;
     while(Listen)
@@ -34,4 +40,8 @@ void Listener::ListenerLoop()
     }
 }
 
+void* Listener::Connect2Thread(void *arg)
+{
+    return ((Listener*)arg)->ListenerLoop();
+}
 

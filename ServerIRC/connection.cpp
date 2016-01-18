@@ -5,11 +5,10 @@ Connection::Connection(QObject *parent) : QObject(parent) { }
 
 Connection::Connection(int clientSocket)
 {
+
     this->clientSocket = clientSocket;
     this->working = true;
-    SocketManager::Write(clientSocket, "Connection slot granted.\n", 50);
-    QObject::connect(this, SIGNAL(OnNewMessage(Message*)),
-                     &(Server::getInstance()), SLOT(readMessage(Message*)), Qt::QueuedConnection);
+    SocketManager::Write(clientSocket, "Connection slot granted.\n", 50);    
 
     pthread_create(&id, NULL, &Connection::handle, this);
 }
@@ -46,6 +45,9 @@ void* Connection::handle(void *arg)
 
 void* Connection::loop()
 {
+    QObject::connect(this, SIGNAL(OnNewMessage(Message*)),
+                     Server::getInstance(), SLOT(readMessage(Message*)));
+
     if (signal(SIGPIPE, Connection::sigpipeHandler) == SIG_ERR)
     {
         qDebug("cant catch SIGPIPE");
@@ -71,7 +73,7 @@ void* Connection::loop()
     }
     qDebug("disconnected");
     close(clientSocket);
-    Server::getInstance().removeConnection(this);
+    Server::getInstance()->removeConnection(this);
     working = false;
     return NULL;
 }
@@ -85,6 +87,7 @@ void Connection::analyze(char *transmission)
         if(messages[i] != "")
         {
             Message* message = new Message((messages[i]).toStdString().c_str());
+            emit OnNewMessage(message);
         }
     }
 }

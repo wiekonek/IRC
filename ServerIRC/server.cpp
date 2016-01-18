@@ -9,10 +9,10 @@ Server::Server(QObject *parent) : QObject(parent)
 
 }
 
-Server& Server::getInstance() // statyczna klasa signleton
+Server* Server::getInstance() // statyczna klasa signleton
 {
     static Server instance;
-    return instance;
+    return &instance;
 }
 
 void Server::addChannel(Channel *channel)
@@ -58,5 +58,5 @@ int Server::GetFreePortNumber()
 
 void Server::readMessage(Message* message)
 {
-    qDebug("message");
+    message->printAll();
 }
