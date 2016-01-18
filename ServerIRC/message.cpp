@@ -21,12 +21,16 @@ Message::Message(const char* json)
         QJsonObject container = return_json.object();
         this->container = new QJsonObject(container);
     }
+    delete(byte_array);
+    delete(json_document);
+    delete(error);
 }
 
 void Message::add(QString key, QString value)
 {
     QJsonValue *json_value = new QJsonValue(value);
     container->insert(key, *json_value);
+    delete(json_value);
 }
 
 void Message::add(QString key, qint32 value)
@@ -37,14 +41,13 @@ void Message::add(QString key, qint32 value)
 QString Message::getValue(QString key)
 {
     QJsonValue answear = container->value(key);
-    //qDebug(qPrintable(answear.toString()));
     return answear.toString();
 }
 
 QByteArray Message::toByte()
 {
-    QJsonDocument *json_document = new QJsonDocument(*container);
-    return json_document->toJson();
+    QJsonDocument json_document(*container);
+    return json_document.toJson();
 }
 
 char* Message::toChar()

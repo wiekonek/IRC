@@ -36,7 +36,7 @@ void* Listener::ListenerLoop()
         int clientSocket = SocketManager::Accept(clientAddress, listenerSocket);
         qDebug() << "New connection slot granted." << "Port:" << clientAddress.sin_port;
 
-        onNewConnection(new Connection(clientSocket));
+        emit onNewConnection(new Connection(clientSocket));
     }
 }
 

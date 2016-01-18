@@ -20,7 +20,15 @@ class Server : public QObject
 public:
      Server(QObject* parent=0);
      static Server* getInstance();
-     vector<Connection *>  active_connection;
+
+     Channel* Create(QString channel_name, bool ispublic = true, QString password = "");
+     Channel* Join(QString channel_name, Connection *connection, QString password = "", bool ispublic = true);
+     void Leave(QString channel_name, Connection* connection);
+     void Send(QString channel_name, Connection* sender, QString text);
+
+     void PrintAllChannels();
+     void PrintPublicChannels();
+     void PrintPrivatechannels();
 signals:
 
 public slots:
@@ -33,11 +41,14 @@ public slots:
     void readMessage(Message *message);
 
 private:
+    Channel* Find(QString name, bool ispublic = true);
+    void Print(vector<Channel *> channels);
+
     Connection *activeConnections[MAX_CONNECTIONS];
 
     vector<Channel *> public_channels;
     vector<Channel *> private_channels;
-
+    vector<Connection *>  active_connection;
     int GetFreePortNumber();
 };
 

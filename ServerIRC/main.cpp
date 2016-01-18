@@ -24,6 +24,14 @@ int main(int argc, char *argv[])
                      server, SLOT(addConnection(Connection*)));
     qDebug("QT signals connected.");
 
+    /*Connection* connection = new Connection();
+    connection->SetName("jacek");
+    Channel* channel = server->Create("fajny kanal");
+    server->Join("fajny kanal", connection);
+    server->PrintPublicChannels();
+    channel->PrintUsers();
+    server->Leave("fajny kanal", connection);
+    channel->PrintUsers();*/
     return a.exec();
 }
 

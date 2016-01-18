@@ -12,6 +12,8 @@
 
 #include "message.h"
 
+using std::queue;
+
 class Connection : public QObject
 {
     Q_OBJECT
@@ -24,18 +26,22 @@ public:
     void Close();
     void SetPort(int port);
     void Disconnect();
+    QString GetName();
+    void SetName(QString name);
+    void SetName(char* name);
     void Send(Message* message);
 
 signals:
     void OnRegisterToChannel(Connection *connection);
     void OnNewMessage(Message *message);
+    void OnDisconnected();
 
 private:
     bool working;
     bool tosend;
     int client_socket;
     QString client_name;
-    std::queue<Message *> *output_messages;
+    queue<Message *> *output_messages;
 
     int port;
     pthread_t id;

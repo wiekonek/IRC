@@ -35,6 +35,22 @@ void Connection::Disconnect()
     working = false;
 }
 
+QString Connection::GetName()
+{
+    return client_name;
+}
+
+void Connection::SetName(QString name)
+{
+    this->client_name = name;
+}
+
+void Connection::SetName(char* name)
+{
+    QString buf_name(name);
+    SetName(buf_name);
+}
+
 void Connection::Send(Message *messsage)
 {
     pthread_mutex_lock(&queue_mutex);
@@ -57,11 +73,6 @@ void* Connection::mainLoop()
 
     while(working)
     {
-        int size = sendManage();
-        size = SocketManager::Write(client_socket, "\4", 10);
-        if(size < 0)
-            break;
-
         char buf[BUF_SIZE];
         int recv_size = SocketManager::ReadNoWait(client_socket, buf, BUF_SIZE);
         if(recv_size > 0)
@@ -69,8 +80,15 @@ void* Connection::mainLoop()
             analyze(buf);
         }
 
+        sendManage();
+        if(recv_size == 0)
+        {
+            break;
+        }
+
         usleep(200000);
     }
+
     qDebug("disconnected");
     close(client_socket);
     Server::getInstance()->removeConnection(this);
@@ -90,6 +108,7 @@ void Connection::analyze(char *transmission)
             emit OnNewMessage(message);
         }
     }
+    delete(buffer);
 }
 
 int Connection::sendManage()
