@@ -8,6 +8,7 @@
 #include <sstream>
 #include <signal.h>
 #include <queue>
+#include <QDebug>
 
 #include "message.h"
 
@@ -19,10 +20,7 @@ public:
     Connection(int clientSocket, struct sockaddr_in address);
     ~Connection();
 
-    bool isWorking();
-    int getMessageCount();
-
-
+    bool IsWorking();
     void Close();
     void SetPort(int port);
     void Disconnect();
@@ -36,18 +34,19 @@ public slots:
 
 private:
     bool working;
-    QString client_name;
     int clientSocket;
-    int port;
-    pthread_t id;
+    QString client_name;
     std::queue<Message *> output_messages;
 
+    int port;
+    pthread_t id;
+
     void* loop();
-    static void analyze(char* buf, int size);
+    void analyze(char* buf, int size);
     static void* handle(void *arg);
     static void sigpipeHandler(int signo);
-    static bool isEndOfMessage(char* sign);
-    static bool isEndOfBuffor(char* sign);
+    static bool isEndOfMessage(char sign);
+    static bool isEndOfBuffor(char sign);
 
 };
 

@@ -55,3 +55,8 @@ int Server::GetFreePortNumber()
     }
     return -1;
 }
+
+void Server::readMessage(Message* message)
+{
+    qDebug("message");
+}

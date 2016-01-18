@@ -10,6 +10,8 @@ Connection::Connection(int clientSocket, sockaddr_in address)
     SocketManager::Write(clientSocket, "Connection slot granted.\n", 50);
     std::string str = "NEW_PORT" + std::to_string(port);
     SocketManager::Write(clientSocket, str.c_str(), 40);
+    QObject::connect(this, SIGNAL(OnNewMessage(Message*)),
+                     &(Server::getInstance()), SLOT(readMessage(Message*)), Qt::QueuedConnection);
 
     pthread_create(&id, NULL, &Connection::handle, this);
 }
@@ -19,15 +21,9 @@ Connection::~Connection()
     SocketManager::Write(clientSocket, "EXIT", 10);
 }
 
-bool Connection::isWorking()
+bool Connection::IsWorking()
 {
     return working;
-}
-
-int Connection::getMessageCount()
-{
-    //throw new std::exception("get message count not implemented");
-    return 0;
 }
 
 void Connection::SetPort(int port)
@@ -45,21 +41,14 @@ void Connection::Send(Message *messsage)
     qDebug("XD");
 }
 
-void Connection::analyze(char *transmission, int size)
+bool Connection::isEndOfBuffor(char sign)
 {
-    int start = 0;
-    for(int i = 0; i<size; i++)
-    {
-        if(isEndOfMessage(transmission[i]))
-        {
-            int end = i;
-            char temp[BUF_SIZE];
-            strncpy(temp, transmission + start, end);
-            start = i;
-        }
-        if(isEndOfBuffor(transmission[i]))
-            break;
-    }
+    return sign == '\0';
+}
+
+bool Connection::isEndOfMessage(char sign)
+{
+    return sign == '\4';
 }
 
 void* Connection::handle(void *arg)
@@ -88,6 +77,8 @@ void* Connection::loop()
         if(recv_size > 0)
         {
             qDebug("message from client appear!");
+            qDebug("%s", buf);
+            sleep(2);
             analyze(buf, BUF_SIZE);
         }
 
@@ -99,14 +90,17 @@ void* Connection::loop()
     working = false;
 }
 
-bool Connection::isEndOfBuffor(char *sign)
+void Connection::analyze(char *transmission, int size)
 {
-    return sign[0] == '\0';
-}
-
-bool Connection::isEndOfMessage(char *sign)
-{
-    return sign[0] == '\4';
+    QString* buffer = new QString(transmission);
+    QStringList messages = buffer->split('\4');
+    for(int i=0; i<messages.size(); i++)
+    {
+        if(messages[i] != "")
+        {
+            Message* message = new Message((messages[i]).toStdString().c_str());
+        }
+    }
 }
 
 void Connection::sigpipeHandler(int signo)

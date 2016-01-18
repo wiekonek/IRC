@@ -13,16 +13,15 @@ class Message
 {
 public:
     Message();
-    Message(char* json);
-
-    void add(QString key, QString value);
-    void add(QString key, int value);
-
-    QByteArray toByte();
-    char* toChar();
+    Message(const char* json);
 
     QString getValue(QString key);
+    void add(QString key, int value);
+    void add(QString key, QString value);
+
+    char* toChar();
     void printAll();
+    QByteArray toByte();
 
 private:
     QJsonObject *container;

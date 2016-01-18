@@ -30,6 +30,8 @@ public slots:
     void addConnection(Connection *connection);
     void removeConnection(Connection *connection);
 
+    void readMessage(Message *message);
+
 private:
     Connection *activeConnections[MAX_CONNECTIONS];
     vector<Connection *>  active_connection;
