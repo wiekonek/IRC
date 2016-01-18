@@ -43,9 +43,9 @@ void messageusage()
     Message *json_in = new Message(raw_message); //tworzymy jsona z otrzymanej wiadomosci
     json_in->printAll();
     QString value = json_in->getValue("channel");
-    qDebug(qPrintable(value));
+    //qDebug(qPrintable(value));
     value = json_in->getValue("text");
-    qDebug(qPrintable(value));
+    //qDebug(qPrintable(value));
 }
 
 

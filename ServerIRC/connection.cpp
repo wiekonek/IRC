@@ -3,13 +3,11 @@
 
 Connection::Connection(QObject *parent) : QObject(parent) { }
 
-Connection::Connection(int clientSocket, sockaddr_in address)
+Connection::Connection(int clientSocket)
 {
     this->clientSocket = clientSocket;
     this->working = true;
     SocketManager::Write(clientSocket, "Connection slot granted.\n", 50);
-    std::string str = "NEW_PORT" + std::to_string(port);
-    SocketManager::Write(clientSocket, str.c_str(), 40);
     QObject::connect(this, SIGNAL(OnNewMessage(Message*)),
                      &(Server::getInstance()), SLOT(readMessage(Message*)), Qt::QueuedConnection);
 
@@ -41,16 +39,6 @@ void Connection::Send(Message *messsage)
     qDebug("XD");
 }
 
-bool Connection::isEndOfBuffor(char sign)
-{
-    return sign == '\0';
-}
-
-bool Connection::isEndOfMessage(char sign)
-{
-    return sign == '\4';
-}
-
 void* Connection::handle(void *arg)
 {
     return ((Connection*)arg)->loop();
@@ -76,10 +64,7 @@ void* Connection::loop()
         int recv_size = SocketManager::ReadNoWait(clientSocket, buf, BUF_SIZE);
         if(recv_size > 0)
         {
-            qDebug("message from client appear!");
-            qDebug("%s", buf);
-            sleep(2);
-            analyze(buf, BUF_SIZE);
+            analyze(buf);
         }
 
         sleep(1);
@@ -88,9 +73,10 @@ void* Connection::loop()
     close(clientSocket);
     Server::getInstance().removeConnection(this);
     working = false;
+    return NULL;
 }
 
-void Connection::analyze(char *transmission, int size)
+void Connection::analyze(char *transmission)
 {
     QString* buffer = new QString(transmission);
     QStringList messages = buffer->split('\4');

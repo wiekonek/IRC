@@ -17,7 +17,7 @@ class Connection : public QObject
     Q_OBJECT
 public:
     Connection(QObject *parent = 0);
-    Connection(int clientSocket, struct sockaddr_in address);
+    Connection(int clientSocket);
     ~Connection();
 
     bool IsWorking();
@@ -42,11 +42,9 @@ private:
     pthread_t id;
 
     void* loop();
-    void analyze(char* buf, int size);
+    void analyze(char* buf);
     static void* handle(void *arg);
     static void sigpipeHandler(int signo);
-    static bool isEndOfMessage(char sign);
-    static bool isEndOfBuffor(char sign);
 
 };
 
