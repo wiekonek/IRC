@@ -3,19 +3,21 @@
 
 Connection::Connection(QObject *parent) : QObject(parent) { }
 
-Connection::Connection(int clientSocket)
+Connection::Connection(int client_socket)
 {
-
-    this->clientSocket = clientSocket;
+    output_messages = new std::queue<Message *>();
+    queue_mutex = PTHREAD_MUTEX_INITIALIZER;
+    this->client_socket = client_socket;
     this->working = true;
-    SocketManager::Write(clientSocket, "Connection slot granted.\n", 50);    
+    this->tosend = false;
+    SocketManager::Write(client_socket, "Connection slot granted.\n", 50);
 
-    pthread_create(&id, NULL, &Connection::handle, this);
+    pthread_create(&id, NULL, &Connection::connect2Thread, this);
 }
 
 Connection::~Connection()
 {
-    SocketManager::Write(clientSocket, "EXIT", 10);
+    SocketManager::Write(client_socket, "EXIT", 10);
 }
 
 bool Connection::IsWorking()
@@ -35,15 +37,13 @@ void Connection::Disconnect()
 
 void Connection::Send(Message *messsage)
 {
-    qDebug("XD");
+    pthread_mutex_lock(&queue_mutex);
+    output_messages->push(messsage);
+    tosend = true;
+    pthread_mutex_unlock(&queue_mutex);
 }
 
-void* Connection::handle(void *arg)
-{
-    return ((Connection*)arg)->loop();
-}
-
-void* Connection::loop()
+void* Connection::mainLoop()
 {
     QObject::connect(this, SIGNAL(OnNewMessage(Message*)),
                      Server::getInstance(), SLOT(readMessage(Message*)));
@@ -57,25 +57,25 @@ void* Connection::loop()
 
     while(working)
     {
-        int size = SocketManager::Write(this->clientSocket, "XD", 50);
-
+        int size = sendManage();
+        size = SocketManager::Write(client_socket, "\4", 10);
         if(size < 0)
             break;
 
         char buf[BUF_SIZE];
-        int recv_size = SocketManager::ReadNoWait(clientSocket, buf, BUF_SIZE);
+        int recv_size = SocketManager::ReadNoWait(client_socket, buf, BUF_SIZE);
         if(recv_size > 0)
         {
             analyze(buf);
         }
 
-        sleep(1);
+        usleep(200000);
     }
     qDebug("disconnected");
-    close(clientSocket);
+    close(client_socket);
     Server::getInstance()->removeConnection(this);
     working = false;
-    return NULL;
+    return 0;
 }
 
 void Connection::analyze(char *transmission)
@@ -90,6 +90,40 @@ void Connection::analyze(char *transmission)
             emit OnNewMessage(message);
         }
     }
+}
+
+int Connection::sendManage()
+{
+    if(tosend)
+    {
+        std::queue<Message *> *bufor = new std::queue<Message *>();
+        pthread_mutex_lock(&queue_mutex);
+        while(output_messages->size() > 0)
+        {
+            bufor->push(output_messages->front());
+            output_messages->pop();
+        }
+        tosend = false;
+        pthread_mutex_unlock(&queue_mutex);
+
+        int size = 0;
+        while(bufor->size() > 0)
+        {
+            Message* message = bufor->front();
+            bufor->pop();
+            size = SocketManager::Write(client_socket, message->toChar(), BUF_SIZE);
+            if(size < 0)
+                break;
+        }
+        delete(bufor);
+        return size;
+    }
+    return 0;
+}
+
+void* Connection::connect2Thread(void *arg)
+{
+    return ((Connection*)arg)->mainLoop();
 }
 
 void Connection::sigpipeHandler(int signo)

@@ -24,26 +24,27 @@ public:
     void Close();
     void SetPort(int port);
     void Disconnect();
+    void Send(Message* message);
 
 signals:
     void OnRegisterToChannel(Connection *connection);
     void OnNewMessage(Message *message);
 
-public slots:
-    void Send(Message *message);
-
 private:
     bool working;
-    int clientSocket;
+    bool tosend;
+    int client_socket;
     QString client_name;
-    std::queue<Message *> output_messages;
+    std::queue<Message *> *output_messages;
 
     int port;
     pthread_t id;
+    pthread_mutex_t queue_mutex;
 
-    void* loop();
+    void* mainLoop();
     void analyze(char* buf);
-    static void* handle(void *arg);
+    int sendManage();
+    static void* connect2Thread(void *arg);
     static void sigpipeHandler(int signo);
 
 };
