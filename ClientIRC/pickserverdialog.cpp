@@ -41,6 +41,8 @@ bool PickServerDialog::TryConnect(const char *ipNumber, int portNumber)
 {
     // TODO return true if client can connect to that ip and port.
     // It should also setup establishedConnection
+    QTcpSocket *tcpSocket = new QTcpSocket();
+    connect(tcpSocket, SIGNAL(connected()), this,
     establishedConnection = new Connection();
     return true;
 }

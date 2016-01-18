@@ -13,10 +13,11 @@ class MainClientWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainClientWindow(QWidget *parent = 0);
+    explicit MainClientWindow(IRCData::UserData *user, QWidget *parent = 0);
     ~MainClientWindow();
 
 signals:
+    void OnClose();
     void OnSendMessage(IRCData::MessageData *message);
     void OnQuitChannel(IRCData::ChannelData *channel);
 
@@ -28,14 +29,19 @@ public slots:
 private slots:
     void on_chatWindow_tabBarClicked(int index);
     void on_button_send_clicked();
+    void on_actionDisconnect_triggered();
+    void on_MainClientWindow_destroyed();
 
 private:
     Ui::MainClientWindow *ui;
 
     QTabWidget *tabbedPane;
-    QList<IRCData::ChannelData*> channels;
+    QList<ChatWidget*> channels;
+    IRCData::UserData *user;
 
-    void RefreshUserList();
+    void RefreshUserList(int index);
+    ChatWidget *GetChannel(QString channelName);
+    ChatWidget *GetCurrentChannel();
 };
 
 #endif // MAINCLIENTWINDOW_H

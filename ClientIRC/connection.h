@@ -2,6 +2,8 @@
 #define CONNECTION_H
 
 #include <QObject>
+#include <QtNetwork/QTcpSocket>
+
 #include "message.h"
 #include "datastructures.h"
 
@@ -19,7 +21,7 @@ public slots:
     void SendMessage(IRCData::MessageData *message);
 
 private:
-    void ConnectionLoop();
+    QTcpSocket *tcpSocket;
 };
 
 #endif // CONNECTION_H

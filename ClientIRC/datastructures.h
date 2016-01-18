@@ -8,7 +8,7 @@ namespace IRCData {
 typedef struct messageData {
     QString content;
     QString username;
-    QString channel;
+    QString channelName;
 } MessageData;
 
 typedef struct userData {

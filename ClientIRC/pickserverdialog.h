@@ -2,6 +2,8 @@
 #define PICKSERVERDIALOG_H
 
 #include <QDialog>
+#include <QtNetwork/QTcpSocket>
+
 #include "connection.h"
 
 namespace Ui {

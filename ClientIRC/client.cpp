@@ -18,7 +18,12 @@ Client::~Client()
 {
     delete connection;
     delete userData;
+    if(mainWindow != NULL)
+        mainWindow->close();
+    delete mainWindow;
     this->~QObject();
+
+    qDebug("Cleaning!");
 }
 
 void Client::Connect(Connection *connection)
@@ -51,7 +56,6 @@ void Client::Disconnect()
 void Client::Cleanup()
 {
     qDebug("Cleaning");
-
 }
 
 void Client::LoggedIn(IRCData::UserData *userData)
@@ -59,11 +63,24 @@ void Client::LoggedIn(IRCData::UserData *userData)
     this->userData = userData;
     qDebug() << "Logged in as:" << userData->username;
 
-    MainClientWindow *mainWindow = new MainClientWindow();
+    mainWindow = new MainClientWindow(userData);
     mainWindow->show();
 
     QObject::connect(mainWindow, SIGNAL(OnSendMessage(IRCData::MessageData*)),
                      connection, SLOT(SendMessage(IRCData::MessageData*)));
+    QObject::connect(mainWindow, SIGNAL(OnClose()), this, SLOT(Cleanup()));
+
+    IRCData::ChannelData *newChannel = new IRCData::ChannelData();
+    newChannel->name = "Admin test channel";
+    newChannel->users.append("admin");
+    newChannel->users.append("testUser");
+    mainWindow->AddChannelTab(newChannel);
+
+    IRCData::ChannelData *secondChannel = new IRCData::ChannelData();
+    secondChannel->name = "Admin second channel";
+    secondChannel->users.append("admin");
+    secondChannel->users.append("scondTestUser");
+    mainWindow->AddChannelTab(secondChannel);
 }
 
 void Client::MessageReceived(Message *message)
