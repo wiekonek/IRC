@@ -50,7 +50,7 @@ public:
 signals:
 
 public slots:
-    void addChannel(Channel *channel);
+    int  addChannel(Channel *channel, int ispublic = 1);
     void removeChannel(Channel *channel);
 
     void addConnection(Connection *connection);

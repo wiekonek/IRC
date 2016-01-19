@@ -16,64 +16,15 @@ Connection::Connection(int client_socket)
     SocketManager::Write(client_socket, message->toChar(), 50);
 
 
-    pthread_create(&id, NULL, &Connection::connect2Thread, this);
+    pthread_create(&id, NULL, &Connection::Connect2Thread, this);
 }
 
-Connection::~Connection()
-{
-    SocketManager::Write(client_socket, "EXIT", 10);
-}
-
-bool Connection::IsWorking()
-{
-    return working;
-}
-
-void Connection::SetPort(int port)
-{
-    this->port = port;
-}
-
-void Connection::Stop()
-{
-    working = false;
-}
-
-int Connection::GetClientSocket()
-{
-    return client_socket;
-}
-
-QString Connection::GetName()
-{
-    return client_name;
-}
-
-void Connection::SetName(QString name)
-{
-    this->client_name = name;
-}
-
-void Connection::SetName(char* name)
-{
-    QString buf_name(name);
-    SetName(buf_name);
-}
-
-void Connection::Send(Message *messsage)
-{
-    pthread_mutex_lock(&queue_mutex);
-    output_messages->push(messsage);
-    tosend = true;
-    pthread_mutex_unlock(&queue_mutex);
-}
-
-void* Connection::mainLoop()
+void* Connection::MainLoop()
 {
     QObject::connect(this, SIGNAL(OnNewMessage(Message*)),
                      Server::getInstance(), SLOT(readMessage(Message*)));
 
-    if (signal(SIGPIPE, Connection::sigpipeHandler) == SIG_ERR)
+    if (signal(SIGPIPE, Connection::SigpipeHandler) == SIG_ERR)
     {
         qDebug("cant catch SIGPIPE");
         perror(0);
@@ -84,17 +35,17 @@ void* Connection::mainLoop()
     {
         char buf[BUF_SIZE];
         int recv_size = SocketManager::ReadNoWait(client_socket, buf, BUF_SIZE);
+
         if(recv_size > 0)
         {
-            //qDebug() << buf;
-            analyze(buf);
+            InputManage(buf);
         }
-
-        sendManage();
-        if(recv_size == 0)
+        else if(recv_size == 0)
         {
             break;
         }
+
+        OutputManage();
 
         usleep(200000);
     }
@@ -105,7 +56,7 @@ void* Connection::mainLoop()
     return 0;
 }
 
-void Connection::analyze(char *transmission)
+void Connection::InputManage(char *transmission)
 {
     QString* buffer = new QString(transmission);
     QStringList messages = buffer->split('\4');
@@ -120,7 +71,7 @@ void Connection::analyze(char *transmission)
     delete(buffer);
 }
 
-int Connection::sendManage()
+int Connection::OutputManage()
 {
     if(tosend)
     {
@@ -150,15 +101,60 @@ int Connection::sendManage()
     return 0;
 }
 
-void* Connection::connect2Thread(void *arg)
+void Connection::Send(Message *messsage)
 {
-    return ((Connection*)arg)->mainLoop();
+    pthread_mutex_lock(&queue_mutex);
+    output_messages->push(messsage);
+    tosend = true;
+    pthread_mutex_unlock(&queue_mutex);
 }
 
-void Connection::sigpipeHandler(int signo)
+bool Connection::IsWorking()
+{
+    return working;
+}
+
+void Connection::Stop()
+{
+    working = false;
+}
+
+int Connection::GetClientSocket()
+{
+    return client_socket;
+}
+
+QString Connection::GetName()
+{
+    return client_name;
+}
+
+void Connection::SetName(QString name)
+{
+    this->client_name = name;
+}
+
+void Connection::SetName(char* name)
+{
+    QString buf_name(name);
+    SetName(buf_name);
+}
+
+void* Connection::Connect2Thread(void *arg)
+{
+    return ((Connection*)arg)->MainLoop();
+}
+
+void Connection::SigpipeHandler(int signo)
 {
     if (signo == SIGPIPE)
     {
         qDebug("connection lost");
     }
 }
+
+Connection::~Connection()
+{
+
+}
+

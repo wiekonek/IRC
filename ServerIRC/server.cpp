@@ -16,16 +16,16 @@ Server* Server::getInstance() // statyczna klasa signleton
 Channel* Server::Create(Connection* connection, QString channel_name, int ispublic, QString password)
 {
     Channel* channel = new Channel(channel_name, ispublic, password);
-    if(ispublic == 1)
+    int err = addChannel(channel);
+    if(err == 0)
     {
-        public_channels.push_back(channel);
         Confirm(connection, CREATE_ACC, 1);
     }
     else
     {
-        private_channels.push_back(channel);
         Confirm(connection, CREATE_ACC, 0);
     }
+
     return channel;
 }
 
@@ -127,10 +127,20 @@ void Server::PrintAllChannels()
     PrintPrivatechannels();
 }
 
-void Server::addChannel(Channel *channel)
+int Server::addChannel(Channel *channel, int ispublic)
 {
-    private_channels.push_back(channel);
-    qDebug() << "New channel created.";
+    if(ispublic == 1)
+    {
+        public_channels.push_back(channel);
+        qDebug() << "New public channel created.";
+        return 0;
+    }
+    else
+    {
+        private_channels.push_back(channel);
+        qDebug() << "New private channel created.";
+    }
+    return 1;
 }
 
 template<class T> void Erase(vector<T*> &vec, T *item) {
@@ -141,6 +151,7 @@ template<class T> void Erase(vector<T*> &vec, T *item) {
 void Server::removeChannel(Channel *channel)
 {
     Erase(private_channels, channel);
+    Erase(public_channels, channel);
 }
 
 void Server::addConnection(Connection *connection)
@@ -151,10 +162,7 @@ void Server::addConnection(Connection *connection)
 
 void Server::removeConnection(Connection *connection)
 {
-    for(int i = 0; i < MAX_CONNECTIONS; i++) {
-        if(activeConnections[i] == connection)
-            delete activeConnections[i];
-    }
+    Erase(active_connection, connection);
 }
 
 Channel* Server::Find(QString name, int ispublic)
