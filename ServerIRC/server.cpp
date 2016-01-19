@@ -75,7 +75,7 @@ void Server::Send(Connection* sender, QString channel_name, QString text)
         {
             if(connection != sender)
             {
-                SocketManager::Write(connection->GetClientSocket(), message->toChar(), BUF_SIZE);
+                connection->Send(message);
             }
         }
     }
@@ -107,7 +107,7 @@ void Server::Confirm(Connection *connection, int command, int value)
     Message* message = new Message();
     message->add("command", command);
     message->add("value", value);
-    SocketManager::Write(connection->GetClientSocket(), message->toChar(), 50);
+    connection->Send(message);
     delete(message);
 }
 
