@@ -27,7 +27,7 @@ void MainClientWindow::AddChannelTab(IRCData::ChannelData *channel)
     tabbedPane->addTab(newTab, channel->name);
     channels.append(newTab);
 
-    IRCData::ChannelMessageData message;
+    IRCData::MessageData message;
     message.channelName = channel->name;
     message.username = user->username;
     message.content = "Join to channel!";
@@ -38,10 +38,10 @@ void MainClientWindow::AddChannelTab(IRCData::ChannelData *channel)
     RefreshUserList(0);
 }
 
-void MainClientWindow::AddMessageToChannel(IRCData::ChannelMessageData *message)
+void MainClientWindow::AddMessageToChannel(IRCData::MessageData *messageData)
 {
-    ChatWidget *widget = GetChannel(message->channelName);
-    widget->AddMessage(message);
+    ChatWidget *widget = GetChannel(messageData->channelName);
+    widget->AddMessage(messageData);
 }
 
 void MainClientWindow::on_chatWindow_tabBarClicked(int index)
@@ -52,7 +52,7 @@ void MainClientWindow::on_chatWindow_tabBarClicked(int index)
 
 void MainClientWindow::on_button_send_clicked()
 {
-    IRCData::ChannelMessageData *message = new IRCData::ChannelMessageData();
+    IRCData::MessageData *message = new IRCData::MessageData();
     message->channelName = GetCurrentChannel()->GetChannelData()->name;
     message->content = ui->lineEdit_message->text();
     message->username = user->username;

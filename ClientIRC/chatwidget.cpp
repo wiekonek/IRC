@@ -15,7 +15,7 @@ ChatWidget::~ChatWidget()
     delete ui;
 }
 
-void ChatWidget::AddMessage(IRCData::ChannelMessageData *messageData)
+void ChatWidget::AddMessage(IRCData::MessageData *messageData)
 {
     qDebug() << channelData->name
              << messageData->username

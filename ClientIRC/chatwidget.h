@@ -15,7 +15,7 @@ class ChatWidget : public QWidget
 public:
     explicit ChatWidget(IRCData::ChannelData *channelData, QWidget *parent = 0);
     ~ChatWidget();
-    void AddMessage(IRCData::ChannelMessageData *messageData);
+    void AddMessage(IRCData::MessageData *messageData);
     void Clean();
     IRCData::ChannelData *GetChannelData();
 

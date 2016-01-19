@@ -1,6 +1,7 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
+
 #include <QObject>
 #include <QtNetwork>
 //#include <QByteArray>
@@ -13,32 +14,29 @@ class Connection : public QObject
 {
     Q_OBJECT
 public:
+    static const QString KEY_CMD;
+    static const QString KEY_USER;
+    static const QString KEY_PUBLIC;
+    static const QString KEY_PASSWORD;
+    static const QString KEY_TEXT;
+    static const QString KET_TYPE;
+    static const QString KEY_CHANNEL;
+
     explicit Connection(QTcpSocket *tcpSocket, QObject *parent = 0);
 
-//#define LOGIN 0
-//#define CREATE 1
-//#define JOIN 2
-//#define LEAVE 3
-//#define MESSAGE 4
-//#define DISCONNECT 5
-
-//#define LOGIN_ACC 6
-//#define CREATE_ACC 7
-//#define JOIN_ACC 8
-//#define LEAVE_ACC 9
-//#define ERROR 20
-
-signals:
-    void OnMessageReceived(IRCData::ChannelMessageData *message);
+signals: //messages from server
+    void OnMessageReceived(IRCData::MessageData *message);
     void OnAcceptUser();
     void OnConnectToChannel(IRCData::ChannelData *channelData);
     void OnLeaveChannel(IRCData::ChannelData *channelData);
     void OnConnectionLost();
     void OnError();
 
-public slots:
-    void SendMessage(IRCData::ChannelMessageData *message);
-    void SendCommand(Message *message);
+public slots: //messages to server
+    void SendMessage(IRCData::MessageData *message);
+    void SendLoginRequest(IRCData::UserData *userData);
+    void SendJoinChannelRequest(IRCData::ChannelData *channelData);
+    void LeaveChannel(IRCData::ChannelData *channelData);
 
 private slots:
     void ReadyToRead();
@@ -46,6 +44,7 @@ private slots:
 
 private:
     QTcpSocket *tcpSocket;
+    void SendCommand(Message *message);
 };
 
 #endif // CONNECTION_H

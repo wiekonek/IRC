@@ -45,6 +45,11 @@ void Client::Connect(Connection *connection)
                      this, SLOT(LoggedIn(IRCData::UserData*)));
     QObject::connect(loginDialog, SIGNAL(OnClose()),
                      this, SLOT(Cleanup()));
+    QObject::connect(loginDialog,
+                     SIGNAL(OnSendLoginRequest(IRCData::UserData*)),
+                     connection, SLOT(SendLoginRequest(IRCData::UserData*)));
+    QObject::connect(connection, SIGNAL(OnAcceptUser()), loginDialog,
+                     SLOT(AcceptUser()));
 }
 
 void Client::Disconnect()
@@ -69,9 +74,19 @@ void Client::LoggedIn(IRCData::UserData *userData)
     mainWindow = new MainClientWindow(userData);
     mainWindow->show();
 
-    QObject::connect(mainWindow, SIGNAL(OnSendMessage(IRCData::ChannelMessageData*)),
-                     connection, SLOT(SendMessage(IRCData::ChannelMessageData*)));
+    QObject::connect(mainWindow, SIGNAL(OnSendMessage(IRCData::MessageData*)),
+                     connection, SLOT(SendMessage(IRCData::MessageData*)));
     QObject::connect(mainWindow, SIGNAL(OnClose()), this, SLOT(Cleanup()));
+    QObject::connect(mainWindow, SIGNAL(OnJoinChannelRequest(IRCData::MessageData*)),
+                     connection, SLOT(SendJoinChannelRequest(IRCData::ChannelData*)));
+    QObject::connect(mainWindow, SIGNAL(OnLeaveChannel(IRCData::ChannelData*)),
+                     connection, SLOT(LeaveChannel(IRCData::ChannelData*)));
+
+    QObject::connect(connection, SIGNAL(OnConnectToChannel(IRCData::ChannelData*)),
+                     mainWindow, SLOT(AddChannelTab(IRCData::ChannelData*)));
+    QObject::connect(connection, SIGNAL(OnMessageReceived(IRCData::MessageData*)),
+                     mainWindow, SLOT(AddMessageToChannel(IRCData::MessageData*)));
+
 
     IRCData::ChannelData *newChannel = new IRCData::ChannelData();
     newChannel->name = "Admin test channel";

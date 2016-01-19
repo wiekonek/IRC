@@ -15,9 +15,10 @@ LoginDialog::~LoginDialog()
 void LoginDialog::on_button_login_clicked()
 {
 // TODO zalogowac sieeeee
+
     IRCData::UserData *userData = new IRCData::UserData();
-    userData->username = "admin";
-    userData->perrmission = "a";
+    userData->username = ui->lineEdit_username->text();
+    userData->perrmission = ui->lineEdit_password->text();
     emit OnLoggedIn(userData);
     this->close();
 }

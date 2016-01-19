@@ -18,12 +18,13 @@ public:
 
 signals:
     void OnClose();
-    void OnSendMessage(IRCData::ChannelMessageData *message);
-    void OnQuitChannel(IRCData::ChannelData *channel);
+    void OnSendMessage(IRCData::MessageData *messageData);
+    void OnJoinChannelRequest(IRCData::MessageData *messageData);
+    void OnLeaveChannel(IRCData::ChannelData *channelData);
 
 public slots:
-    void AddChannelTab(IRCData::ChannelData *channel);
-    void AddMessageToChannel(IRCData::ChannelMessageData *message);
+    void AddChannelTab(IRCData::ChannelData *channelData);
+    void AddMessageToChannel(IRCData::MessageData *messageData);
 
 
 private slots:

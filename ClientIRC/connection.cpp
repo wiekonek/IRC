@@ -3,13 +3,19 @@
 #include <QtNetwork>
 #include <QMessageBox>
 
+const QString Connection::KEY_CMD = "command";
+const QString Connection::KEY_USER = "user";
+const QString Connection::KEY_PUBLIC = "public";
+const QString Connection::KEY_PASSWORD = "password";
+const QString Connection::KEY_TEXT = "text";
+const QString Connection::KET_TYPE = "type";
+const QString Connection::KEY_CHANNEL = "channel";
 
 Connection::Connection(QTcpSocket *tcpSocket, QObject *parent) : QObject(parent)
 {
     this->tcpSocket = tcpSocket;
 
-    connect(tcpSocket, SIGNAL(readyRead()),
-            this, SLOT(ReadyToRead()));
+    connect(tcpSocket, SIGNAL(readyRead()), this, SLOT(ReadyToRead()));
     connect(tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(Error(QAbstractSocket::SocketError)));
 
@@ -18,14 +24,51 @@ Connection::Connection(QTcpSocket *tcpSocket, QObject *parent) : QObject(parent)
              << "\n  local port: " << tcpSocket->localPort();
 }
 
-void Connection::SendMessage(IRCData::ChannelMessageData *message)
+void Connection::SendMessage(IRCData::MessageData *message)
 {
     qDebug() << "<Send message>"
              << "\n  channel:" << message->channelName
              << "\n  username:" <<message->username
              << "\n  content:" <<message->content;
-    // TODO send message!!!
-    tcpSocket->write(message->content.toStdString().c_str());
+
+    Message *msg = new Message();
+    msg->add(KEY_CMD, MESSAGE);
+    msg->add(KEY_CHANNEL, message->channelName);
+    msg->add(KEY_TEXT, message->content);
+
+    SendCommand(msg);
+    delete msg;
+}
+
+void Connection::SendLoginRequest(IRCData::UserData *userData)
+{
+    Message *msg = new Message();
+    msg->add(KEY_CMD, LOGIN);
+    msg->add(KEY_USER, userData->username);
+    msg->add(KEY_PASSWORD, userData->password);
+
+    SendCommand(msg);
+    delete msg;
+}
+
+void Connection::SendJoinChannelRequest(IRCData::ChannelData *channelData)
+{
+    Message *msg = new Message();
+    msg->add(KEY_CMD, JOIN);
+    msg->add(KEY_CHANNEL, channelData->name);
+
+    SendCommand(msg);
+    delete msg;
+}
+
+void Connection::LeaveChannel(IRCData::ChannelData *channelData)
+{
+    Message *msg = new Message();
+    msg->add(KEY_CMD, LEAVE);
+    msg->add(KEY_CHANNEL, channelData->name);
+
+    SendCommand(msg);
+    delete msg;
 }
 
 void Connection::SendCommand(Message *message)

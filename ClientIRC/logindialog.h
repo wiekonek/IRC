@@ -19,6 +19,10 @@ public:
 signals:
     void OnLoggedIn(IRCData::UserData *userData);
     void OnClose();
+    void OnSendLoginRequest(IRCData::UserData *userData);
+
+public slots:
+    void AcceptUser();
 
 private slots:
     void on_button_login_clicked();

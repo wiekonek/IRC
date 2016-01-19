@@ -70,8 +70,3 @@ void PickServerDialog::on_button_connect_clicked()
         qDebug("Can't connect. Try other ip/port");
     }
 }
-
-void PickServerDialog::OnSocketConnected()
-{
-
-}
