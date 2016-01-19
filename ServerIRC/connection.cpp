@@ -10,7 +10,11 @@ Connection::Connection(int client_socket)
     this->client_socket = client_socket;
     this->working = true;
     this->tosend = false;
-    SocketManager::Write(client_socket, "Connection slot granted.\n", 50);
+
+    Message *message = new Message();
+    message->add("command", WELCOM);
+    SocketManager::Write(client_socket, message->toChar(), 50);
+
 
     pthread_create(&id, NULL, &Connection::connect2Thread, this);
 }
@@ -136,6 +140,7 @@ int Connection::sendManage()
             Message* message = bufor->front();
             bufor->pop();
             size = SocketManager::Write(client_socket, message->toChar(), BUF_SIZE);
+            delete(message);
             if(size < 0)
                 break;
         }

@@ -79,7 +79,6 @@ void Server::Send(Connection* sender, QString channel_name, QString text)
             }
         }
     }
-    delete(message);
 }
 
 void Server::Login(Connection* connection, QString name)
@@ -108,7 +107,6 @@ void Server::Confirm(Connection *connection, int command, int value)
     message->add("command", command);
     message->add("value", value);
     connection->Send(message);
-    delete(message);
 }
 
 void Server::PrintPublicChannels()
@@ -189,7 +187,7 @@ int Server::GetFreePortNumber()
 
 void Server::readMessage(Message* message)
 {
-    message->printAll();
+   // message->printAll();
     message->add("password", "");
     Connection* connection = (Connection*)QObject::sender();
     if(connection == NULL)
@@ -203,6 +201,7 @@ void Server::readMessage(Message* message)
         {
         case LOGIN:
             Login(connection, message->getValue("user"));
+            qDebug() << "new user logged in" << message->getValue("user");
             break;
 
         case CREATE:
