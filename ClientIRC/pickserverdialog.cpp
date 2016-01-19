@@ -1,6 +1,8 @@
 #include "pickserverdialog.h"
 #include "ui_pickserverdialog.h"
 
+#include <QMessageBox>
+
 PickServerDialog::PickServerDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::PickServerDialog)
@@ -39,10 +41,15 @@ void PickServerDialog::SetupButton()
 
 bool PickServerDialog::TryConnect(const char *ipNumber, int portNumber)
 {
-    // TODO return true if client can connect to that ip and port.
-    // It should also setup establishedConnection
-    establishedConnection = new Connection();
-    return true;
+    QTcpSocket *tcpSocket = new QTcpSocket();
+    tcpSocket->connectToHost(ipNumber, portNumber);
+
+    if(tcpSocket->waitForConnected()) {
+        establishedConnection = new Connection(tcpSocket);
+        return true;
+    }
+
+    return false;
 }
 
 void PickServerDialog::on_button_quit_clicked()
@@ -57,6 +64,14 @@ void PickServerDialog::on_button_connect_clicked()
         emit OnConnect(establishedConnection);
         this->close();
     } else {
+        QMessageBox::warning(this, "IRC Client",
+                             "Can't connect."
+                             "Please check the ip and port.");
         qDebug("Can't connect. Try other ip/port");
     }
+}
+
+void PickServerDialog::OnSocketConnected()
+{
+
 }

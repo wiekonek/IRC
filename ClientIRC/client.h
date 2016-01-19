@@ -26,6 +26,7 @@ public slots:
 private:
     Connection *connection;
     IRCData::UserData *userData;
+    MainClientWindow *mainWindow;
 };
 
 #endif // CLIENT_H

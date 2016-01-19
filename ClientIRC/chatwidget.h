@@ -13,17 +13,16 @@ class ChatWidget : public QWidget
     Q_OBJECT
 
 public:
-
-    explicit ChatWidget(QString channelName, QWidget *parent = 0);
+    explicit ChatWidget(IRCData::ChannelData *channelData, QWidget *parent = 0);
     ~ChatWidget();
     void AddMessage(IRCData::MessageData *messageData);
     void Clean();
-    QString GetChannelName();
+    IRCData::ChannelData *GetChannelData();
 
 private:
     Ui::chatWidget *ui;
 
-    QString channelName;
+    IRCData::ChannelData *channelData;
 };
 
 #endif // CHATWIDGET_H

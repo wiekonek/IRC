@@ -1,12 +1,13 @@
 #include "chatwidget.h"
 #include "ui_chatwidget.h"
+#include <QDebug>
 
-ChatWidget::ChatWidget(QString channelName, QWidget *parent) :
+ChatWidget::ChatWidget(IRCData::ChannelData *channelData, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::chatWidget)
 {
     ui->setupUi(this);
-    this->channelName = channelName;
+    this->channelData = channelData;
 }
 
 ChatWidget::~ChatWidget()
@@ -16,9 +17,27 @@ ChatWidget::~ChatWidget()
 
 void ChatWidget::AddMessage(IRCData::MessageData *messageData)
 {
-    // TODO do it better, with html
+    qDebug() << channelData->name
+             << messageData->username
+             << messageData->content;
+    QString userNamePrefix = "<p style=\" margin-top:0px; margin-bottom:0px;"
+                             "margin-left:0px; margin-right:0px;"
+                             "-qt-block-indent:0; text-indent:0px;\""
+                             "<span style=\" font-size:12pt;"
+                             "font-weight:600;\">";
+    QString userNameSufix = "</span></p>";
+    QString contentPrefix = "<p align=\"right\" style=\" margin-top:0px;"
+                            "margin-bottom:0px; margin-left:0px;"
+                            "margin-right:0px; -qt-block-indent:0;"
+                            "text-indent:0px;\">";
+    QString contentSufix = "<br /></p>";
+
     ui->textBrowser->append(messageData->username);
-    ui->textBrowser->append(messageData->content);
+
+    ui->textBrowser->append(">>>" + messageData->content);
+//    ui->textBrowser->insertHtml(userNamePrefix + messageData->username
+//                                 + userNameSufix);
+
 }
 
 void ChatWidget::Clean()
@@ -26,7 +45,7 @@ void ChatWidget::Clean()
     // TODO
 }
 
-QString ChatWidget::GetChannelName()
+IRCData::ChannelData *ChatWidget::GetChannelData()
 {
-    return channelName;
+    return channelData;
 }

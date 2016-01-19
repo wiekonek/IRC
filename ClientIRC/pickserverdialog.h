@@ -2,6 +2,8 @@
 #define PICKSERVERDIALOG_H
 
 #include <QDialog>
+#include <QtNetwork>
+
 #include "connection.h"
 
 namespace Ui {
@@ -25,6 +27,8 @@ private slots:
     void on_lineEdit_port_textChanged(const QString &arg1);
     void on_button_quit_clicked();
     void on_button_connect_clicked();
+    void OnSocketConnected();
+
 
 private:
     Ui::PickServerDialog *ui;
