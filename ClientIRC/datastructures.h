@@ -5,11 +5,15 @@
 #include <vector>
 
 namespace IRCData {
-typedef struct messageData {
+typedef struct channelMessageData {
     QString content;
     QString username;
     QString channelName;
-} MessageData;
+} ChannelMessageData;
+
+typedef struct commandMessageData {
+    QString command;
+} CommandMessaegData;
 
 typedef struct userData {
     QString username;

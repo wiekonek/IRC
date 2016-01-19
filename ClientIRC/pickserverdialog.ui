@@ -55,7 +55,7 @@
        <set>Qt::ImhDigitsOnly</set>
       </property>
       <property name="text">
-       <string>9999</string>
+       <string>6666</string>
       </property>
       <property name="clearButtonEnabled">
        <bool>true</bool>

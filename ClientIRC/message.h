@@ -1,17 +1,45 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
-#include <QObject>
+#define LOGIN 0
+#define CREATE 1
+#define JOIN 2
+#define LEAVE 3
+#define MESSAGE 4
+#define DISCONNECT 5
 
-class Message : public QObject
+#define LOGIN_ACC 6
+#define CREATE_ACC 7
+#define JOIN_ACC 8
+#define LEAVE_ACC 9
+#define ERROR 20
+
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonValue>
+#include <QJsonParseError>
+#include <QFile>
+
+class Message
 {
-    Q_OBJECT
 public:
-    explicit Message(QObject *parent = 0);
+    Message();
+    Message(const char* json);
 
-signals:
+    int GetCommand();
 
-public slots:
+    QString getValue(QString key);
+    void add(QString key, int value);
+    void add(QString key, QString value);
+
+    char* toChar();
+    void printAll();
+    QByteArray toByte();
+
+private:
+    QJsonObject *container;
+
 };
 
 #endif // MESSAGE_H

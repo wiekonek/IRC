@@ -69,8 +69,8 @@ void Client::LoggedIn(IRCData::UserData *userData)
     mainWindow = new MainClientWindow(userData);
     mainWindow->show();
 
-    QObject::connect(mainWindow, SIGNAL(OnSendMessage(IRCData::MessageData*)),
-                     connection, SLOT(SendMessage(IRCData::MessageData*)));
+    QObject::connect(mainWindow, SIGNAL(OnSendMessage(IRCData::ChannelMessageData*)),
+                     connection, SLOT(SendMessage(IRCData::ChannelMessageData*)));
     QObject::connect(mainWindow, SIGNAL(OnClose()), this, SLOT(Cleanup()));
 
     IRCData::ChannelData *newChannel = new IRCData::ChannelData();

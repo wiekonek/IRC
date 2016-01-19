@@ -3,6 +3,7 @@
 #include <QtNetwork>
 #include <QMessageBox>
 
+
 Connection::Connection(QTcpSocket *tcpSocket, QObject *parent) : QObject(parent)
 {
     this->tcpSocket = tcpSocket;
@@ -17,7 +18,7 @@ Connection::Connection(QTcpSocket *tcpSocket, QObject *parent) : QObject(parent)
              << "\n  local port: " << tcpSocket->localPort();
 }
 
-void Connection::SendMessage(IRCData::MessageData *message)
+void Connection::SendMessage(IRCData::ChannelMessageData *message)
 {
     qDebug() << "<Send message>"
              << "\n  channel:" << message->channelName
@@ -27,11 +28,17 @@ void Connection::SendMessage(IRCData::MessageData *message)
     tcpSocket->write(message->content.toStdString().c_str());
 }
 
+void Connection::SendCommand(Message *message)
+{
+    tcpSocket->write(message->toByte());
+}
+
 void Connection::ReadyToRead()
 {
     // TODO read from socket
     qDebug() << "<<<<<<" << tcpSocket->readAll();
-
+    if(false) // jeśli wiadomość na kanał
+        emit OnMessageReceived(new Message);
 }
 
 void Connection::Error(QAbstractSocket::SocketError error)
