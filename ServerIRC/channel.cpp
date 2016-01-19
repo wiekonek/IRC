@@ -5,7 +5,7 @@ Channel::Channel(QObject *parent) : QObject(parent)
 
 }
 
-Channel::Channel(QString name, bool ispublic, QString password)
+Channel::Channel(QString name, int ispublic, QString password)
 {
     this->name = name;
     this->ispublic = ispublic;
@@ -14,7 +14,7 @@ Channel::Channel(QString name, bool ispublic, QString password)
 
 int Channel::Add(Connection *connection, QString password)
 {
-    if(ispublic)
+    if(ispublic == 1)
     {
         connections.push_back(connection);
         return 0;
@@ -30,10 +30,11 @@ int Channel::Add(Connection *connection, QString password)
 void Channel::Remove(Connection *connection)
 {
     auto index = find(connections.begin(), connections.end(), connection);
-    connections.erase(index);
+    if(index != connections.end())
+        connections.erase(index);
 }
 
-bool Channel::IsPublic()
+int Channel::IsPublic()
 {
     return ispublic;
 }
@@ -41,6 +42,11 @@ bool Channel::IsPublic()
 QString Channel::GetName()
 {
     return name;
+}
+
+const vector<Connection *> Channel::GetConnections()
+{
+    return connections;
 }
 
 void Channel::PrintUsers()

@@ -30,9 +30,14 @@ void Connection::SetPort(int port)
     this->port = port;
 }
 
-void Connection::Disconnect()
+void Connection::Stop()
 {
     working = false;
+}
+
+int Connection::GetClientSocket()
+{
+    return client_socket;
 }
 
 QString Connection::GetName()
@@ -91,7 +96,6 @@ void* Connection::mainLoop()
 
     qDebug("disconnected");
     close(client_socket);
-    Server::getInstance()->removeConnection(this);
     working = false;
     return 0;
 }

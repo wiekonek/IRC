@@ -14,13 +14,14 @@ class Channel : public QObject
     Q_OBJECT
 public:
     Channel(QObject *parent = 0);
-    Channel(QString name, bool ispublic = true, QString password = "");
+    Channel(QString name, int ispublic = true, QString password = "");
 
     int Add(Connection* connection, QString password = "");
     void Remove(Connection* connection);
 
-    bool IsPublic();
+    int IsPublic();
     QString GetName();
+    const vector<Connection *> GetConnections();
 
     void PrintUsers();
 signals:
@@ -28,7 +29,7 @@ signals:
 public slots:
 private:
     int port;
-    bool ispublic;
+    int ispublic;
     QString name;
     QString password;
     vector<Connection *> connections;

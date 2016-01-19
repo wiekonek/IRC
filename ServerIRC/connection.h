@@ -23,10 +23,10 @@ public:
     ~Connection();
 
     bool IsWorking();
-    void Close();
+    void Stop();
     void SetPort(int port);
-    void Disconnect();
     QString GetName();
+    int GetClientSocket();
     void SetName(QString name);
     void SetName(char* name);
     void Send(Message* message);

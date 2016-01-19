@@ -13,10 +13,10 @@ Server* Server::getInstance() // statyczna klasa signleton
     return &instance;
 }
 
-Channel* Server::Create(QString channel_name, bool ispublic, QString password)
+Channel* Server::Create(QString channel_name, int ispublic, QString password)
 {
     Channel* channel = new Channel(channel_name, ispublic, password);
-    if(ispublic)
+    if(ispublic == 1)
     {
         public_channels.push_back(channel);
     }
@@ -27,10 +27,10 @@ Channel* Server::Create(QString channel_name, bool ispublic, QString password)
     return channel;
 }
 
-Channel* Server::Join(QString channel_name, Connection* connection, QString password, bool ispublic)
+Channel* Server::Join(QString channel_name, Connection* connection, QString password, int ispublic)
 {
     Channel* channel = Find(channel_name, ispublic);
-    if(ispublic)
+    if(ispublic == 1)
     {
         channel->Add(connection);
     }
@@ -58,7 +58,44 @@ void Server::Leave(QString channel_name, Connection* connection)
 
 void Server::Send(QString channel_name, Connection* sender, QString text)
 {
+    Channel* channel = Find(channel_name) != NULL ? Find(channel_name) : Find(channel_name, false);
+    Message* message = new Message();
+    message->add("user", sender->GetName());
+    message->add("text", text);
+    message->add("command", MESSAGE);
+    if(channel != NULL)
+    {
+        for(Connection* connection : channel->GetConnections())
+        {
+            if(connection != sender)
+            {
+                SocketManager::Write(connection->GetClientSocket(), message->toChar(), BUF_SIZE);
+            }
+        }
+    }
+}
 
+void Server::Login(Connection* connection, QString name)
+{
+    connection->SetName(name);
+    Message* message = new Message();
+    message->add("command", "login");
+    message->add("result", 1);
+    SocketManager::Write(connection->GetClientSocket(), message->toChar(), 200);
+}
+
+void Server::Disconnect(Connection *connection)
+{
+    connection->Stop();
+    for(Channel* channel : public_channels)
+    {
+        channel->Remove(connection);
+    }
+
+    for(Channel* channel : private_channels)
+    {
+        channel->Remove(connection);
+    }
 }
 
 void Server::PrintPublicChannels()
@@ -109,7 +146,7 @@ void Server::removeConnection(Connection *connection)
     }
 }
 
-Channel* Server::Find(QString name, bool ispublic)
+Channel* Server::Find(QString name, int ispublic)
 {
     vector<Channel*> *channels = ispublic ? &public_channels : &private_channels;
     for(Channel* channel : *channels)
@@ -140,4 +177,47 @@ int Server::GetFreePortNumber()
 void Server::readMessage(Message* message)
 {
     message->printAll();
+    Connection* connection = (Connection*)QObject::sender();
+    if(connection == NULL)
+    {
+        qDebug("problem with arrived message...");
+    }
+    else
+    {
+        int command = message->getValue("command").toInt();
+        switch(command)
+        {
+        case LOGIN:
+            Login(connection, message->getValue("user"));
+            break;
+
+        case CREATE:
+            Create(message->getValue("channel"),
+                   message->getValue("public").toInt(),
+                   message->getValue("password"));
+            break;
+
+        case JOIN:
+            Join(message->getValue("channel"),
+                 connection,
+                 message->getValue("password"),
+                 message->getValue("public").toInt());
+            break;
+
+        case LEAVE:
+            Leave(message->getValue("channel"), connection);
+            break;
+
+        case MESSAGE:
+            Send(message->getValue("channel"),
+                 connection,
+                 message->getValue("text"));
+            break;
+
+        case DISCONNECT:
+            Disconnect(connection);
+            break;
+
+        }
+    }
 }
