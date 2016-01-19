@@ -9,6 +9,11 @@
 #define LEAVE 3
 #define MESSAGE 4
 #define DISCONNECT 5
+
+#define LOGIN_ACC 6
+#define CREATE_ACC 7
+#define JOIN_ACC 8
+#define LEAVE_ACC 9
 #define ERROR 20
 
 #include <vector>
@@ -29,12 +34,13 @@ public:
      Server(QObject* parent=0);
      static Server* getInstance();
 
-     Channel* Create(QString channel_name, int ispublic = 1, QString password = "");
-     Channel* Join(QString channel_name, Connection *connection, QString password = "", int ispublic = true);
-     void Leave(QString channel_name, Connection* connection);
-     void Send(QString channel_name, Connection* sender, QString text);
+     Channel* Create(Connection* connection, QString channel_name, int ispublic = 1, QString password = "");
+     Channel* Join(Connection *connection, QString channel_name, QString password = "", int ispublic = true);
+     void Leave(Connection* connection, QString channel_name);
+     void Send(Connection* sender, QString channel_name, QString text);
      void Login(Connection* connection, QString name);
      void Disconnect(Connection* connection);
+     void Confirm(Connection* connection, int command, int value);
 
      void PrintAllChannels();
      void PrintPublicChannels();

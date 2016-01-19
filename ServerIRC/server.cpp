@@ -13,29 +13,33 @@ Server* Server::getInstance() // statyczna klasa signleton
     return &instance;
 }
 
-Channel* Server::Create(QString channel_name, int ispublic, QString password)
+Channel* Server::Create(Connection* connection, QString channel_name, int ispublic, QString password)
 {
     Channel* channel = new Channel(channel_name, ispublic, password);
     if(ispublic == 1)
     {
         public_channels.push_back(channel);
+        Confirm(connection, CREATE_ACC, 1);
     }
     else
     {
         private_channels.push_back(channel);
+        Confirm(connection, CREATE_ACC, 0);
     }
     return channel;
 }
 
-Channel* Server::Join(QString channel_name, Connection* connection, QString password, int ispublic)
+Channel* Server::Join(Connection* connection, QString channel_name, QString password, int ispublic)
 {
     Channel* channel = Find(channel_name, ispublic);
     if(ispublic == 1)
     {
         channel->Add(connection);
+        Confirm(connection, JOIN_ACC, 1);
     }
     else
     {
+        Confirm(connection, JOIN_ACC, 0);
         int err = channel->Add(connection, password);
         if(err != 0)
             qDebug("odrzucono - zaimplementuj join");
@@ -43,20 +47,22 @@ Channel* Server::Join(QString channel_name, Connection* connection, QString pass
     return channel;
 }
 
-void Server::Leave(QString channel_name, Connection* connection)
+void Server::Leave(Connection* connection, QString channel_name)
 {
     Channel* channel = Find(channel_name) != NULL ? Find(channel_name) : Find(channel_name, false);
     if(channel != NULL)
     {
         channel->Remove(connection);
+        Confirm(connection, LEAVE_ACC, 1);
     }
     else
     {
         qDebug("kanal nie istnieje");
+        Confirm(connection, LEAVE_ACC, 0);
     }
 }
 
-void Server::Send(QString channel_name, Connection* sender, QString text)
+void Server::Send(Connection* sender, QString channel_name, QString text)
 {
     Channel* channel = Find(channel_name) != NULL ? Find(channel_name) : Find(channel_name, false);
     Message* message = new Message();
@@ -73,15 +79,13 @@ void Server::Send(QString channel_name, Connection* sender, QString text)
             }
         }
     }
+    delete(message);
 }
 
 void Server::Login(Connection* connection, QString name)
 {
     connection->SetName(name);
-    Message* message = new Message();
-    message->add("command", "login");
-    message->add("result", 1);
-    SocketManager::Write(connection->GetClientSocket(), message->toChar(), 200);
+    Confirm(connection, LOGIN_ACC, 1);
 }
 
 void Server::Disconnect(Connection *connection)
@@ -96,6 +100,15 @@ void Server::Disconnect(Connection *connection)
     {
         channel->Remove(connection);
     }
+}
+
+void Server::Confirm(Connection *connection, int command, int value)
+{
+    Message* message = new Message();
+    message->add("command", command);
+    message->add("value", value);
+    SocketManager::Write(connection->GetClientSocket(), message->toChar(), 50);
+    delete(message);
 }
 
 void Server::PrintPublicChannels()
@@ -177,6 +190,7 @@ int Server::GetFreePortNumber()
 void Server::readMessage(Message* message)
 {
     message->printAll();
+    message->add("password", "");
     Connection* connection = (Connection*)QObject::sender();
     if(connection == NULL)
     {
@@ -192,25 +206,26 @@ void Server::readMessage(Message* message)
             break;
 
         case CREATE:
-            Create(message->getValue("channel"),
+            Create(connection,
+                   message->getValue("channel"),
                    message->getValue("public").toInt(),
                    message->getValue("password"));
             break;
 
         case JOIN:
-            Join(message->getValue("channel"),
-                 connection,
+            Join(connection,
+                 message->getValue("channel"),
                  message->getValue("password"),
                  message->getValue("public").toInt());
             break;
 
         case LEAVE:
-            Leave(message->getValue("channel"), connection);
+            Leave(connection, message->getValue("channel"));
             break;
 
         case MESSAGE:
-            Send(message->getValue("channel"),
-                 connection,
+            Send(connection,
+                 message->getValue("channel"),
                  message->getValue("text"));
             break;
 

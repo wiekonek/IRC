@@ -82,6 +82,7 @@ void* Connection::mainLoop()
         int recv_size = SocketManager::ReadNoWait(client_socket, buf, BUF_SIZE);
         if(recv_size > 0)
         {
+            //qDebug() << buf;
             analyze(buf);
         }
 
