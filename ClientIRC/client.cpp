@@ -55,7 +55,10 @@ void Client::Disconnect()
 
 void Client::Cleanup()
 {
+    if(mainWindow != NULL)
+        mainWindow->close();
     qDebug("Cleaning");
+    delete this;
 }
 
 void Client::LoggedIn(IRCData::UserData *userData)

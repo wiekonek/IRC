@@ -2,7 +2,7 @@
 #define CONNECTION_H
 
 #include <QObject>
-#include <QtNetwork/QTcpSocket>
+#include <QtNetwork>
 
 #include "message.h"
 #include "datastructures.h"
@@ -11,7 +11,7 @@ class Connection : public QObject
 {
     Q_OBJECT
 public:
-    explicit Connection(QObject *parent = 0);
+    explicit Connection(QTcpSocket *tcpSocket, QObject *parent = 0);
 
 signals:
     void OnMessageReceived(Message *message);
@@ -19,6 +19,10 @@ signals:
 
 public slots:
     void SendMessage(IRCData::MessageData *message);
+
+private slots:
+    void ReadyToRead();
+    void Error(QAbstractSocket::SocketError error);
 
 private:
     QTcpSocket *tcpSocket;
