@@ -21,12 +21,20 @@ public:
 //#define LEAVE 3
 //#define MESSAGE 4
 //#define DISCONNECT 5
+
+//#define LOGIN_ACC 6
+//#define CREATE_ACC 7
+//#define JOIN_ACC 8
+//#define LEAVE_ACC 9
 //#define ERROR 20
 
 signals:
     void OnMessageReceived(IRCData::ChannelMessageData *message);
     void OnAcceptUser();
+    void OnConnectToChannel(IRCData::ChannelData *channelData);
+    void OnLeaveChannel(IRCData::ChannelData *channelData);
     void OnConnectionLost();
+    void OnError();
 
 public slots:
     void SendMessage(IRCData::ChannelMessageData *message);

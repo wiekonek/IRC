@@ -36,9 +36,17 @@ void Connection::SendCommand(Message *message)
 void Connection::ReadyToRead()
 {
     // TODO read from socket
-    qDebug() << "<<<<<<" << tcpSocket->readAll();
-    if(false) // jeśli wiadomość na kanał
-        emit OnMessageReceived(new Message);
+    QByteArray dataArray = tcpSocket->readAll();
+    qDebug() << "<<<<<<" << dataArray;
+    Message *msg = new Message(dataArray);
+    QString command = msg->getValue("command");
+//    switch(command) {
+//    case "message":
+
+//    }
+
+//    if(false) // jeśli wiadomość na kanał
+//        emit OnMessageReceived();
 }
 
 void Connection::Error(QAbstractSocket::SocketError error)
