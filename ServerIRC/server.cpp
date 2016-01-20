@@ -69,6 +69,7 @@ void Server::Send(Connection* sender, QString channel_name, QString text)
     message->add("user", sender->GetName());
     message->add("text", text);
     message->add("command", MESSAGE);
+    message->add("channel", channel_name);
     if(channel != NULL)
     {
         for(Connection* connection : channel->GetConnections())
