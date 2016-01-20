@@ -10,24 +10,108 @@ Connection::Connection(int client_socket)
     this->client_socket = client_socket;
     this->working = true;
     this->tosend = false;
-    SocketManager::Write(client_socket, "Connection slot granted.\n", 50);
 
-    pthread_create(&id, NULL, &Connection::connect2Thread, this);
+    Message *message = new Message();
+    message->add("command", WELCOM);
+    SocketManager::Write(client_socket, message->toChar(), 50);
+
+
+    pthread_create(&id, NULL, &Connection::Connect2Thread, this);
 }
 
-Connection::~Connection()
+void* Connection::MainLoop()
 {
-    SocketManager::Write(client_socket, "EXIT", 10);
+    QObject::connect(this, SIGNAL(OnNewMessage(Message*)),
+                     Server::getInstance(), SLOT(readMessage(Message*)));
+
+    if (signal(SIGPIPE, Connection::SigpipeHandler) == SIG_ERR)
+    {
+        qDebug("cant catch SIGPIPE");
+        perror(0);
+        exit(1);
+    }
+
+    while(working)
+    {
+        char buf[BUF_SIZE];
+        int recv_size = SocketManager::ReadNoWait(client_socket, buf, BUF_SIZE);
+
+        if(recv_size > 0)
+        {
+            InputManage(buf);
+        }
+        else if(recv_size == 0)
+        {
+            break;
+        }
+
+        OutputManage();
+
+        usleep(200000);
+    }
+
+    qDebug("disconnected");
+    close(client_socket);
+    working = false;
+    return 0;
+}
+
+void Connection::InputManage(char *transmission)
+{
+    QString* buffer = new QString(transmission);
+    QStringList messages = buffer->split('\4');
+    for(int i=0; i<messages.size(); i++)
+    {
+        if(messages[i] != "")
+        {
+            Message* message = new Message((messages[i]).toStdString().c_str());
+            emit OnNewMessage(message);
+        }
+    }
+    delete(buffer);
+}
+
+int Connection::OutputManage()
+{
+    if(tosend)
+    {
+        std::queue<Message *> *bufor = new std::queue<Message *>();
+        pthread_mutex_lock(&queue_mutex);
+        while(output_messages->size() > 0)
+        {
+            bufor->push(output_messages->front());
+            output_messages->pop();
+        }
+        tosend = false;
+        pthread_mutex_unlock(&queue_mutex);
+
+        int size = 0;
+        while(bufor->size() > 0)
+        {
+            Message* message = bufor->front();
+            bufor->pop();
+            size = SocketManager::Write(client_socket, message->toChar(), BUF_SIZE);
+            delete(message);
+            if(size < 0)
+                break;
+        }
+        delete(bufor);
+        return size;
+    }
+    return 0;
+}
+
+void Connection::Send(Message *messsage)
+{
+    pthread_mutex_lock(&queue_mutex);
+    output_messages->push(messsage);
+    tosend = true;
+    pthread_mutex_unlock(&queue_mutex);
 }
 
 bool Connection::IsWorking()
 {
     return working;
-}
-
-void Connection::SetPort(int port)
-{
-    this->port = port;
 }
 
 void Connection::Stop()
@@ -56,104 +140,21 @@ void Connection::SetName(char* name)
     SetName(buf_name);
 }
 
-void Connection::Send(Message *messsage)
+void* Connection::Connect2Thread(void *arg)
 {
-    pthread_mutex_lock(&queue_mutex);
-    output_messages->push(messsage);
-    tosend = true;
-    pthread_mutex_unlock(&queue_mutex);
+    return ((Connection*)arg)->MainLoop();
 }
 
-void* Connection::mainLoop()
-{
-    QObject::connect(this, SIGNAL(OnNewMessage(Message*)),
-                     Server::getInstance(), SLOT(readMessage(Message*)));
-
-    if (signal(SIGPIPE, Connection::sigpipeHandler) == SIG_ERR)
-    {
-        qDebug("cant catch SIGPIPE");
-        perror(0);
-        exit(1);
-    }
-
-    while(working)
-    {
-        char buf[BUF_SIZE];
-        int recv_size = SocketManager::ReadNoWait(client_socket, buf, BUF_SIZE);
-        if(recv_size > 0)
-        {
-            //qDebug() << buf;
-            analyze(buf);
-        }
-
-        sendManage();
-        if(recv_size == 0)
-        {
-            break;
-        }
-
-        usleep(200000);
-    }
-
-    qDebug("disconnected");
-    close(client_socket);
-    working = false;
-    return 0;
-}
-
-void Connection::analyze(char *transmission)
-{
-    QString* buffer = new QString(transmission);
-    QStringList messages = buffer->split('\4');
-    for(int i=0; i<messages.size(); i++)
-    {
-        if(messages[i] != "")
-        {
-            Message* message = new Message((messages[i]).toStdString().c_str());
-            emit OnNewMessage(message);
-        }
-    }
-    delete(buffer);
-}
-
-int Connection::sendManage()
-{
-    if(tosend)
-    {
-        std::queue<Message *> *bufor = new std::queue<Message *>();
-        pthread_mutex_lock(&queue_mutex);
-        while(output_messages->size() > 0)
-        {
-            bufor->push(output_messages->front());
-            output_messages->pop();
-        }
-        tosend = false;
-        pthread_mutex_unlock(&queue_mutex);
-
-        int size = 0;
-        while(bufor->size() > 0)
-        {
-            Message* message = bufor->front();
-            bufor->pop();
-            size = SocketManager::Write(client_socket, message->toChar(), BUF_SIZE);
-            if(size < 0)
-                break;
-        }
-        delete(bufor);
-        return size;
-    }
-    return 0;
-}
-
-void* Connection::connect2Thread(void *arg)
-{
-    return ((Connection*)arg)->mainLoop();
-}
-
-void Connection::sigpipeHandler(int signo)
+void Connection::SigpipeHandler(int signo)
 {
     if (signo == SIGPIPE)
     {
         qDebug("connection lost");
     }
 }
+
+Connection::~Connection()
+{
+
+}
+

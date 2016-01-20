@@ -22,37 +22,33 @@ public:
     Connection(int clientSocket);
     ~Connection();
 
-    bool IsWorking();
+    void Send(Message* message);
     void Stop();
-    void SetPort(int port);
+
+    bool IsWorking();
     QString GetName();
     int GetClientSocket();
     void SetName(QString name);
     void SetName(char* name);
-    void Send(Message* message);
 
 signals:
-    void OnRegisterToChannel(Connection *connection);
     void OnNewMessage(Message *message);
-    void OnDisconnected();
 
 private:
+    void* MainLoop();
+    void InputManage(char* buf);
+    int OutputManage();
+    static void* Connect2Thread(void *arg);
+    static void SigpipeHandler(int signo);
+
     bool working;
     bool tosend;
     int client_socket;
     QString client_name;
     queue<Message *> *output_messages;
 
-    int port;
     pthread_t id;
     pthread_mutex_t queue_mutex;
-
-    void* mainLoop();
-    void analyze(char* buf);
-    int sendManage();
-    static void* connect2Thread(void *arg);
-    static void sigpipeHandler(int signo);
-
 };
 
 #endif // CONNECTION_H

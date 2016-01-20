@@ -9,11 +9,13 @@
 #define LEAVE 3
 #define MESSAGE 4
 #define DISCONNECT 5
+#define WELCOM 10
 
 #define LOGIN_ACC 6
 #define CREATE_ACC 7
 #define JOIN_ACC 8
 #define LEAVE_ACC 9
+
 #define ERROR 20
 
 #include <vector>
@@ -48,7 +50,7 @@ public:
 signals:
 
 public slots:
-    void addChannel(Channel *channel);
+    int  addChannel(Channel *channel, int ispublic = 1);
     void removeChannel(Channel *channel);
 
     void addConnection(Connection *connection);
