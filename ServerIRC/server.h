@@ -48,7 +48,7 @@ public:
 signals:
 
 public slots:
-    int  addChannel(Channel *channel);
+    void  addChannel(Channel *channel);
     void removeChannel(Channel *channel);
 
     void addConnection(Connection *connection);

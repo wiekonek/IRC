@@ -15,18 +15,18 @@ Server* Server::getInstance() // statyczna klasa signleton
 
 Channel* Server::Create(Connection* connection, QString channel_name)
 {
-    Channel* channel = new Channel(channel_name);
-    int err = addChannel(channel);
-    if(err == 0)
+    if(Find(channel_name) == NULL)
     {
+        Channel* channel = new Channel(channel_name);
+        addChannel(channel);
         SendConfirm(connection, CREATE_ACC, 1);
+        return channel;
     }
     else
     {
         SendConfirm(connection, CREATE_ACC, 0);
+        return NULL;
     }
-
-    return channel;
 }
 
 Channel* Server::Join(Connection* connection, QString channel_name)
@@ -112,11 +112,10 @@ void Server::PrintPublicChannels()
     Print(public_channels);
 }
 
-int Server::addChannel(Channel *channel)
+void Server::addChannel(Channel *channel)
 {  
     public_channels.push_back(channel);
     qDebug() << "New public channel created.";
-    return 0;
 }
 
 template<class T> void Erase(vector<T*> &vec, T *item) {
