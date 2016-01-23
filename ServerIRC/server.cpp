@@ -13,79 +13,81 @@ Server* Server::getInstance() // statyczna klasa signleton
     return &instance;
 }
 
-Channel* Server::Create(Connection* connection, QString channel_name, int ispublic)
+Channel* Server::Create(Connection* connection, QString channel_name)
 {
-    Channel* channel = new Channel(channel_name, ispublic);
+    Channel* channel = new Channel(channel_name);
     int err = addChannel(channel);
     if(err == 0)
     {
-        Confirm(connection, CREATE_ACC, 1);
+        SendConfirm(connection, CREATE_ACC, 1);
     }
     else
     {
-        Confirm(connection, CREATE_ACC, 0);
+        SendConfirm(connection, CREATE_ACC, 0);
     }
 
     return channel;
 }
 
-Channel* Server::Join(Connection* connection, QString channel_name, int ispublic)
+Channel* Server::Join(Connection* connection, QString channel_name)
 {
-    Channel* channel = Find(channel_name, ispublic);
-    if(ispublic == 1)
+    Channel* channel = Find(channel_name);
+    if(channel != NULL)
     {
         channel->Add(connection);
-        Confirm(connection, JOIN_ACC, 1);
+        SendConfirm(connection, JOIN_ACC, 1);
     }
     else
     {
-        Confirm(connection, JOIN_ACC, 0);
-        int err = channel->Add(connection);
-        if(err != 0)
-            qDebug("odrzucono - zaimplementuj join");
+        qDebug("JOIN::kanal nie istnieje");
+        SendConfirm(connection, JOIN_ACC, 0);
     }
     return channel;
 }
 
 void Server::Leave(Connection* connection, QString channel_name)
 {
-    Channel* channel = Find(channel_name) != NULL ? Find(channel_name) : Find(channel_name, false);
+    Channel* channel = Find(channel_name);
     if(channel != NULL)
     {
         channel->Remove(connection);
-        Confirm(connection, LEAVE_ACC, 1);
+        SendConfirm(connection, LEAVE_ACC, 1);
     }
     else
     {
-        qDebug("kanal nie istnieje");
-        Confirm(connection, LEAVE_ACC, 0);
+        qDebug("LEAVE::kanal nie istnieje ");
+        SendConfirm(connection, LEAVE_ACC, 0);
     }
 }
 
 void Server::Send(Connection* sender, QString channel_name, QString text)
 {
-    Channel* channel = Find(channel_name) != NULL ? Find(channel_name) : Find(channel_name, false);
-    Message* message = new Message();
-    message->add("user", sender->GetName());
-    message->add("text", text);
-    message->add("command", MESSAGE);
-    message->add("channel", channel_name);
+    Channel* channel = Find(channel_name);
     if(channel != NULL)
     {
         for(Connection* connection : channel->GetConnections())
         {
-            if(connection != sender)
+            if(connection != sender) //niech stworzy sie wiele kopi tego obiektu, connection->Send() je niszczy
             {
+                Message* message = new Message();
+                message->add("user", sender->GetName());
+                message->add("text", text);
+                message->add("command", MESSAGE);
+                message->add("channel", channel_name);
                 connection->Send(message);
             }
         }
+    }
+    else
+    {
+        qDebug("wyslano wiadomosc do nie istniejacego kanalu...");
     }
 }
 
 void Server::Login(Connection* connection, QString name)
 {
     connection->SetName(name);
-    Confirm(connection, LOGIN_ACC, 1);
+    SendConfirm(connection, LOGIN_ACC, 1);
 }
 
 void Server::Disconnect(Connection *connection)
@@ -95,14 +97,9 @@ void Server::Disconnect(Connection *connection)
     {
         channel->Remove(connection);
     }
-
-    for(Channel* channel : private_channels)
-    {
-        channel->Remove(connection);
-    }
 }
 
-void Server::Confirm(Connection *connection, int command, int value)
+void Server::SendConfirm(Connection *connection, int command, int value)
 {
     Message* message = new Message();
     message->add("command", command);
@@ -115,33 +112,11 @@ void Server::PrintPublicChannels()
     Print(public_channels);
 }
 
-void Server::PrintPrivatechannels()
-{
-    Print(private_channels);
-}
-
-void Server::PrintAllChannels()
-{
-    qDebug() << "publiczne";
-    PrintPublicChannels();
-    qDebug() << "prywatne:";
-    PrintPrivatechannels();
-}
-
-int Server::addChannel(Channel *channel, int ispublic)
-{
-    if(ispublic == 1)
-    {
-        public_channels.push_back(channel);
-        qDebug() << "New public channel created.";
-        return 0;
-    }
-    else
-    {
-        private_channels.push_back(channel);
-        qDebug() << "New private channel created.";
-    }
-    return 1;
+int Server::addChannel(Channel *channel)
+{  
+    public_channels.push_back(channel);
+    qDebug() << "New public channel created.";
+    return 0;
 }
 
 template<class T> void Erase(vector<T*> &vec, T *item) {
@@ -151,7 +126,6 @@ template<class T> void Erase(vector<T*> &vec, T *item) {
 
 void Server::removeChannel(Channel *channel)
 {
-    Erase(private_channels, channel);
     Erase(public_channels, channel);
 }
 
@@ -166,9 +140,9 @@ void Server::removeConnection(Connection *connection)
     Erase(active_connection, connection);
 }
 
-Channel* Server::Find(QString name, int ispublic)
+Channel* Server::Find(QString name)
 {
-    vector<Channel*> *channels = ispublic ? &public_channels : &private_channels;
+    vector<Channel*> *channels = &public_channels;
     for(Channel* channel : *channels)
     {
         if(channel->GetName() == name)
@@ -215,14 +189,12 @@ void Server::readMessage(Message* message)
 
         case CREATE:
             Create(connection,
-                   message->getValue("channel"),
-                   message->getValue("public").toInt());
+                   message->getValue("channel"));
             break;
 
         case JOIN:
             Join(connection,
-                 message->getValue("channel"),
-                 message->getValue("public").toInt());
+                 message->getValue("channel"));
             break;
 
         case LEAVE:
