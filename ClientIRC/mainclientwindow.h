@@ -40,6 +40,8 @@ private slots:
 
     void on_chatWindow_tabCloseRequested(int index);
 
+    void on_actionRaw_command_sender_triggered();
+
 private:
     Ui::MainClientWindow *ui;
 

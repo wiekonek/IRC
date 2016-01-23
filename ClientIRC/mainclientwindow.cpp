@@ -3,6 +3,7 @@
 #include "chatwidget.h"
 #include <QStandardItemModel>
 #include "stringpicker.h"
+#include "commandsender.h"
 
 MainClientWindow::MainClientWindow(IRCData::UserData *user, QWidget *parent) :
     QMainWindow(parent),
@@ -107,7 +108,7 @@ void MainClientWindow::on_MainClientWindow_destroyed()
 void MainClientWindow::on_actionConnect_to_new_channel_triggered()
 {
     StringPicker *channelNamePicker
-            = new StringPicker("New channel", "Pick new channel name", "Connect");
+            = new StringPicker("New channel", "Pick new channel name", "Connect", this);
     QObject::connect(channelNamePicker, SIGNAL(OnValuePicked(QString*)),
                                       this, SLOT(ConnectToNewChannel(QString*)));
     channelNamePicker->show();
@@ -116,4 +117,10 @@ void MainClientWindow::on_actionConnect_to_new_channel_triggered()
 void MainClientWindow::on_chatWindow_tabCloseRequested(int index)
 {
     // TODO disconnect from channel
+}
+
+void MainClientWindow::on_actionRaw_command_sender_triggered()
+{
+    CommandSender *cmdSender = new CommandSender(this);
+    cmdSender->show();
 }

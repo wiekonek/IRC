@@ -67,10 +67,15 @@ void Connection::LeaveChannel(IRCData::ChannelData *channelData)
     delete msg;
 }
 
+void Connection::SendByteArray(QByteArray *array)
+{
+    tcpSocket->write(*array);
+}
+
 void Connection::SendCommand(Message *message)
 {
     tcpSocket->write(message->toByte());
-
+    qDebug(">Command send: \n>>%s", message->toChar());
 }
 
 void Connection::ReadyToRead()

@@ -42,6 +42,7 @@ public slots: //messages to server
     void SendCreateChannelRequest(IRCData::ChannelData *channelData);
     void SendJoinChannelRequest(IRCData::ChannelData *channelData);
     void LeaveChannel(IRCData::ChannelData *channelData);
+    void SendByteArray(QByteArray *array);
 
 private slots:
     void ReadyToRead();

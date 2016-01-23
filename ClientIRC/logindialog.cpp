@@ -17,7 +17,7 @@ LoginDialog::~LoginDialog()
 void LoginDialog::on_button_login_clicked()
 {
     userData->username = ui->lineEdit_username->text();
-    userData->perrmission = ui->lineEdit_password->text();
+    userData->password = ui->lineEdit_password->text();
     emit OnSendLoginRequest(userData);
 }
 

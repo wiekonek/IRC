@@ -128,7 +128,14 @@
     <addaction name="actionConnect_to_new_channel"/>
     <addaction name="actionDisconnect"/>
    </widget>
+   <widget class="QMenu" name="menuDebug">
+    <property name="title">
+     <string>Debug</string>
+    </property>
+    <addaction name="actionRaw_command_sender"/>
+   </widget>
    <addaction name="menuOptions"/>
+   <addaction name="menuDebug"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionDisconnect">
@@ -139,6 +146,11 @@
   <action name="actionConnect_to_new_channel">
    <property name="text">
     <string>Connect to new  channel</string>
+   </property>
+  </action>
+  <action name="actionRaw_command_sender">
+   <property name="text">
+    <string>Raw command sender</string>
    </property>
   </action>
  </widget>
