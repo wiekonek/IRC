@@ -48,6 +48,11 @@ void MainClientWindow::ConnectToNewChannel(QString *channelName)
     emit OnCreateChannelRequest(channelData);
 }
 
+void MainClientWindow::SendByteArray(QByteArray *array)
+{
+    emit OnSendByteArray(array);
+}
+
 void MainClientWindow::on_chatWindow_tabBarClicked(int index)
 {
     RefreshUserList(index);
@@ -108,7 +113,7 @@ void MainClientWindow::on_MainClientWindow_destroyed()
 void MainClientWindow::on_actionConnect_to_new_channel_triggered()
 {
     StringPicker *channelNamePicker
-            = new StringPicker("New channel", "Pick new channel name", "Connect", this);
+            = new StringPicker("New channel", "Pick new channel name", "Connect");
     QObject::connect(channelNamePicker, SIGNAL(OnValuePicked(QString*)),
                                       this, SLOT(ConnectToNewChannel(QString*)));
     channelNamePicker->show();
@@ -121,6 +126,8 @@ void MainClientWindow::on_chatWindow_tabCloseRequested(int index)
 
 void MainClientWindow::on_actionRaw_command_sender_triggered()
 {
-    CommandSender *cmdSender = new CommandSender(this);
+    CommandSender *cmdSender = new CommandSender();
+    QObject::connect(cmdSender, SIGNAL(OnSendCommand(QByteArray*)),
+                     this, SLOT(SendByteArray(QByteArray*)));
     cmdSender->show();
 }

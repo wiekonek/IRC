@@ -3,7 +3,7 @@
  <class>CommandSender</class>
  <widget class="QWidget" name="CommandSender">
   <property name="windowModality">
-   <enum>Qt::WindowModal</enum>
+   <enum>Qt::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -29,7 +29,7 @@
     <string>Send</string>
    </property>
   </widget>
-  <widget class="QTextEdit" name="textEdit_command">
+  <widget class="QPlainTextEdit" name="plainTextEdit_command">
    <property name="geometry">
     <rect>
      <x>20</x>

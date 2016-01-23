@@ -71,11 +71,12 @@ void Client::LoggedIn(IRCData::UserData *userData)
                      connection, SLOT(SendJoinChannelRequest(IRCData::ChannelData*)));
     QObject::connect(mainWindow, SIGNAL(OnLeaveChannel(IRCData::ChannelData*)),
                      connection, SLOT(LeaveChannel(IRCData::ChannelData*)));
-
     QObject::connect(connection, SIGNAL(OnConnectToChannel(IRCData::ChannelData*)),
                      mainWindow, SLOT(AddChannelTab(IRCData::ChannelData*)));
     QObject::connect(connection, SIGNAL(OnMessageReceived(IRCData::MessageData*)),
                      mainWindow, SLOT(AddMessageToChannel(IRCData::MessageData*)));
+    QObject::connect(mainWindow, SIGNAL(OnSendByteArray(QByteArray*)),
+                     connection, SLOT(SendByteArray(QByteArray*)));
 }
 
 

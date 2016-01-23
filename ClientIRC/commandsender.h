@@ -22,6 +22,8 @@ signals:
 private slots:
     void on_button_send_clicked();
 
+    void on_plainTextEdit_command_textChanged();
+
 private:
     Ui::CommandSender *ui;
 };

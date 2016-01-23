@@ -18,6 +18,7 @@ public:
 
 signals:
     void OnClose();
+    void OnSendByteArray(QByteArray *array);
     void OnSendMessage(IRCData::MessageData *messageData);
     void OnCreateChannelRequest(IRCData::ChannelData *channelData);
     void OnJoinChannelRequest(IRCData::ChannelData *channelData);
@@ -30,16 +31,15 @@ public slots:
 
 private slots:
     void ConnectToNewChannel(QString *channelName);
+    void SendByteArray(QByteArray *array);
 
     void on_chatWindow_tabBarClicked(int index);
     void on_button_send_clicked();
     void on_MainClientWindow_destroyed();
+    void on_chatWindow_tabCloseRequested(int index);
 
     void on_actionConnect_to_new_channel_triggered();
     void on_actionDisconnect_triggered();
-
-    void on_chatWindow_tabCloseRequested(int index);
-
     void on_actionRaw_command_sender_triggered();
 
 private:
