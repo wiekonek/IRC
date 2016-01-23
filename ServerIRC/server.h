@@ -52,20 +52,17 @@ public slots:
     void removeChannel(Channel *channel);
 
     void addConnection(Connection *connection);
-    void removeConnection(Connection *connection);
+    void removeConnection();
 
     void readMessage(Message *message);
 
 private:
     Channel* FindChannel(QString name);
-    Connection* FindConnection(QString name);
+    Connection* FindConnection(QString user_name);
     void Print(vector<Channel *> channels);
-
-    Connection *activeConnections[MAX_CONNECTIONS];
 
     vector<Channel *> public_channels;
     vector<Connection *>  active_connection;
-    int GetFreePortNumber();
 };
 
 #endif // SERVER_H

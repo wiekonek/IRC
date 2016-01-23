@@ -81,10 +81,17 @@ void Server::Send(Connection* sender, QString channel_name, QString text)
     }
 }
 
-void Server::Login(Connection* connection, QString name)
+void Server::Login(Connection* connection, QString user_name)
 {
-    connection->SetName(name);
-    SendConfirm(connection, LOGIN_ACC, 1);
+    if(FindConnection(user_name) == NULL)
+    {
+        connection->SetName(user_name);
+        SendConfirm(connection, LOGIN_ACC, 1);
+    }
+    else
+    {
+        SendConfirm(connection, LOGIN_ACC, 0);
+    }
 }
 
 void Server::Disconnect(Connection *connection)
@@ -135,9 +142,11 @@ void Server::addConnection(Connection *connection)
     qDebug() << "New connection established.\n";
 }
 
-void Server::removeConnection(Connection *connection)
+void Server::removeConnection()
 {
+    Connection *connection = (Connection*)QObject::sender();
     Erase(active_connection, connection);
+    delete(connection);
 }
 
 Channel* Server::FindChannel(QString name)
@@ -151,6 +160,17 @@ Channel* Server::FindChannel(QString name)
     return NULL;
 }
 
+Connection* Server::FindConnection(QString user_name)
+{
+    vector<Connection*> *connections = &active_connection;
+    for(Connection* connection : *connections)
+    {
+        if(connection->GetName() == user_name)
+           return connection;
+    }
+    return NULL;
+}
+
 void Server::Print(vector<Channel *> channels)
 {
     for(Channel* channel : channels)
@@ -159,19 +179,8 @@ void Server::Print(vector<Channel *> channels)
     }
 }
 
-int Server::GetFreePortNumber()
-{
-    for(int i = 0; i < MAX_CONNECTIONS; i++) {
-        if(activeConnections[i] == NULL)
-            return i;
-    }
-    return -1;
-}
-
 void Server::readMessage(Message* message)
 {
-    //message->printAll();
-    //message->add("password", "");
     Connection* connection = (Connection*)QObject::sender();
     if(connection == NULL)
     {

@@ -23,6 +23,8 @@ void* Connection::MainLoop()
 {
     QObject::connect(this, SIGNAL(OnNewMessage(Message*)),
                      Server::getInstance(), SLOT(readMessage(Message*)));
+    QObject::connect(this, SIGNAL(OnDisconnect()),
+                     Server::getInstance(), SLOT(removeConnection()));
 
     if (signal(SIGPIPE, Connection::SigpipeHandler) == SIG_ERR)
     {
@@ -56,6 +58,7 @@ void* Connection::MainLoop()
     qDebug("disconnected");
     close(client_socket);
     working = false;
+    emit OnDisconnect();
     return 0;
 }
 

@@ -33,6 +33,7 @@ public:
 
 signals:
     void OnNewMessage(Message *message);
+    void OnDisconnect();
 
 private:
     void* MainLoop();
