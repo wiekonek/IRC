@@ -24,6 +24,8 @@ signals:
 private slots:
     void on_button_pickStr_clicked();
 
+    void on_lineEdit_value_textChanged(const QString &arg1);
+
 private:
     Ui::StringPicker *ui;
 };

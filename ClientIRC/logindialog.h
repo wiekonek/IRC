@@ -28,6 +28,8 @@ private slots:
     void on_button_login_clicked();
     void on_button_quit_clicked();
 
+    void on_lineEdit_username_textChanged(const QString &arg1);
+
 private:
     Ui::LoginDialog *ui;
     IRCData::UserData *userData;

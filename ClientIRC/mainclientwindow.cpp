@@ -8,8 +8,7 @@
 
 MainClientWindow::MainClientWindow(Connection *connection,
                                    IRCData::UserData *user, QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainClientWindow)
+    QMainWindow(parent), ui(new Ui::MainClientWindow)
 {
     ui->setupUi(this);
     this->user = user;
@@ -17,6 +16,7 @@ MainClientWindow::MainClientWindow(Connection *connection,
     tabbedPane = ui->chatWindow;
     tabbedPane->removeTab(0);
     ui->label_userName->setText(user->username);
+    ui->button_send->setEnabled(false);
 
     connect(connection, SIGNAL(OnMessageReceived(IRCData::MessageData*)),
             this, SLOT(AddMessageToChannel(IRCData::MessageData*)));
@@ -44,6 +44,7 @@ void MainClientWindow::AddChannelTab(IRCData::ChannelData *channel)
     tabbedPane->addTab(newTab, channel->name);
     channels.append(newTab);
 
+    ui->button_send->setEnabled(true);
     RefreshUserList(0);
 }
 
@@ -58,7 +59,10 @@ void MainClientWindow::ChannelCreatedPrompt(bool *ok)
     if(*ok)
         QMessageBox::information(this, "Channel", "Channel created.");
     else
-        QMessageBox::warning(this, "Channel", "Channel didn't created.");
+        QMessageBox::warning(this, "Channel", "Channel didn't created. "
+                                              "Probably channel with specific "
+                                              "name already exists. "
+                                              "Try other name.");
 }
 
 void MainClientWindow::CreateNewChannel(QString *channelName)
@@ -141,11 +145,12 @@ void MainClientWindow::on_MainClientWindow_destroyed()
     emit OnClose();
 }
 
-
 void MainClientWindow::on_chatWindow_tabCloseRequested(int index)
 {
-    // TODO disconnect from channel
-    index++;
+    IRCData::ChannelData *channelData = new IRCData::ChannelData();
+    channelData->name = tabbedPane->tabText(index);
+    connection->SendLeaveChannel(channelData);
+    tabbedPane->removeTab(index);
 }
 
 void MainClientWindow::on_actionCreate_new_channel_triggered()

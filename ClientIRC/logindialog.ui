@@ -33,36 +33,13 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>Password:</string>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="1">
      <widget class="QLineEdit" name="lineEdit_username">
       <property name="text">
-       <string>admin</string>
+       <string/>
       </property>
       <property name="maxLength">
        <number>30</number>
-      </property>
-      <property name="clearButtonEnabled">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QLineEdit" name="lineEdit_password">
-      <property name="text">
-       <string>admin</string>
-      </property>
-      <property name="maxLength">
-       <number>30</number>
-      </property>
-      <property name="echoMode">
-       <enum>QLineEdit::Password</enum>
       </property>
       <property name="clearButtonEnabled">
        <bool>true</bool>
@@ -97,10 +74,24 @@
     </item>
    </layout>
   </widget>
-  <zorder>gridLayoutWidget</zorder>
-  <zorder>horizontalLayoutWidget</zorder>
-  <zorder>button_quit</zorder>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>lineEdit_username</sender>
+   <signal>returnPressed()</signal>
+   <receiver>button_login</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>234</x>
+     <y>49</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>329</x>
+     <y>115</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

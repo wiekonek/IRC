@@ -102,5 +102,22 @@
   </widget>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>lineEdit_port</sender>
+   <signal>returnPressed()</signal>
+   <receiver>button_connect</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>243</x>
+     <y>69</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>346</x>
+     <y>115</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
