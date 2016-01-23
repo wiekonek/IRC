@@ -47,6 +47,7 @@ void Client::Disconnect()
 {
     qDebug("Disconnected.");
     Cleanup();
+    mainWindow->Disconnected();
 }
 
 void Client::Cleanup()

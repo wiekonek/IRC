@@ -18,6 +18,8 @@ public:
             IRCData::UserData *user, QWidget *parent = 0);
     ~MainClientWindow();
 
+    void Disconnected();
+
 signals:
     void OnClose();
 
@@ -27,7 +29,7 @@ public slots:
 
 
 private slots:
-    void ChannelCreatedPrompt();
+    void ChannelCreatedPrompt(bool *ok);
 
     void CreateNewChannel(QString *channelName);
     void JoinChannel(QString *channelName);
@@ -39,10 +41,7 @@ private slots:
     void on_chatWindow_tabCloseRequested(int index);
 
     void on_actionDisconnect_triggered();
-
-
     void on_actionCreate_new_channel_triggered();
-
     void on_actionConnect_triggered();
 
 private:

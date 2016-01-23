@@ -32,6 +32,7 @@ signals: //messages from server
     void OnMessageReceived(IRCData::MessageData *message);
     void OnAcceptUser(bool *ok);
     void OnConnectToChannel(IRCData::ChannelData *channelData);
+    void OnCreateChannel(bool *ok);
     void OnLeaveChannel(IRCData::ChannelData *channelData);
     void OnConnectionLost();
     void OnError();
@@ -41,7 +42,7 @@ public slots: //messages to server
     void SendLoginRequest(IRCData::UserData *userData);
     void SendCreateChannelRequest(IRCData::ChannelData *channelData);
     void SendJoinChannelRequest(IRCData::ChannelData *channelData);
-    void LeaveChannel(IRCData::ChannelData *channelData);
+    void SendLeaveChannel(IRCData::ChannelData *channelData);
     void SendByteArray(QByteArray *array);
 
 private slots:

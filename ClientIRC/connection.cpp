@@ -57,7 +57,7 @@ void Connection::SendJoinChannelRequest(IRCData::ChannelData *channelData)
     delete msg;
 }
 
-void Connection::LeaveChannel(IRCData::ChannelData *channelData)
+void Connection::SendLeaveChannel(IRCData::ChannelData *channelData)
 {
     Message *msg = new Message();
     msg->add(KEYS::CMD, LEAVE);
@@ -111,10 +111,15 @@ void Connection::ReadyToRead()
     }
         break;
     case LEAVE_ACC:
-
+        emit OnLeaveChannel(new IRCData::ChannelData());
         break;
     case CREATE_ACC:
-
+    {
+        bool ok = false;
+        if(msg->getValue(KEYS::VALUE).toInt() == 1)
+            ok = true;
+        emit OnCreateChannel(&ok);
+    }
         break;
     case MESSAGE:
         message = new IRCData::MessageData();

@@ -2,6 +2,7 @@
 #include "ui_mainclientwindow.h"
 #include "chatwidget.h"
 #include <QStandardItemModel>
+#include <QMessageBox>
 #include "stringpicker.h"
 #include "commandsender.h"
 
@@ -16,12 +17,25 @@ MainClientWindow::MainClientWindow(Connection *connection,
     tabbedPane = ui->chatWindow;
     tabbedPane->removeTab(0);
     ui->label_userName->setText(user->username);
+
+    connect(connection, SIGNAL(OnMessageReceived(IRCData::MessageData*)),
+            this, SLOT(AddMessageToChannel(IRCData::MessageData*)));
+    connect(connection, SIGNAL(OnConnectToChannel(IRCData::ChannelData*)),
+            this, SLOT(AddChannelTab(IRCData::ChannelData*)));
+    connect(connection, SIGNAL(OnCreateChannel(bool*)),
+            this, SLOT(ChannelCreatedPrompt(bool*)));
 }
 
 MainClientWindow::~MainClientWindow()
 {
     emit OnClose();
     delete ui;
+}
+
+void MainClientWindow::Disconnected()
+{
+    QMessageBox::warning(this, "Server", "Server error. Disconnected.");
+    this->close();
 }
 
 void MainClientWindow::AddChannelTab(IRCData::ChannelData *channel)
@@ -37,6 +51,14 @@ void MainClientWindow::AddMessageToChannel(IRCData::MessageData *messageData)
 {
     ChatWidget *widget = GetChannel(messageData->channelName);
     widget->AddMessage(messageData);
+}
+
+void MainClientWindow::ChannelCreatedPrompt(bool *ok)
+{
+    if(*ok)
+        QMessageBox::information(this, "Channel", "Channel created.");
+    else
+        QMessageBox::warning(this, "Channel", "Channel didn't created.");
 }
 
 void MainClientWindow::CreateNewChannel(QString *channelName)

@@ -1,4 +1,4 @@
-#include "pickserverdialog.h"
+ #include "pickserverdialog.h"
 #include "ui_pickserverdialog.h"
 
 #include <QMessageBox>
@@ -65,7 +65,7 @@ void PickServerDialog::on_button_connect_clicked()
         this->close();
     } else {
         QMessageBox::warning(this, "IRC Client",
-                             "Can't connect."
+                             "Can't connect. "
                              "Please check the ip and port.");
         qDebug("Can't connect. Try other ip/port");
     }
