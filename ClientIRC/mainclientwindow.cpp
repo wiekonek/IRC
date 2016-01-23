@@ -5,15 +5,16 @@
 #include "stringpicker.h"
 #include "commandsender.h"
 
-MainClientWindow::MainClientWindow(IRCData::UserData *user, QWidget *parent) :
+MainClientWindow::MainClientWindow(Connection *connection,
+                                   IRCData::UserData *user, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainClientWindow)
 {
     ui->setupUi(this);
     this->user = user;
+    this->connection = connection;
     tabbedPane = ui->chatWindow;
     tabbedPane->removeTab(0);
-
     ui->label_userName->setText(user->username);
 }
 
@@ -38,19 +39,27 @@ void MainClientWindow::AddMessageToChannel(IRCData::MessageData *messageData)
     widget->AddMessage(messageData);
 }
 
-void MainClientWindow::ConnectToNewChannel(QString *channelName)
+void MainClientWindow::CreateNewChannel(QString *channelName)
 {
     IRCData::ChannelData *channelData = new IRCData::ChannelData();
     channelData->name = *channelName;
     QList<QString> *userList = new QList<QString>();
     userList->append(user->username);
     channelData->users = *userList;
-    emit OnCreateChannelRequest(channelData);
+    connection->SendCreateChannelRequest(channelData);
+}
+
+void MainClientWindow::JoinChannel(QString *channelName)
+{
+    IRCData::ChannelData *channelData = new IRCData::ChannelData();
+    channelData->name = *channelName;
+    channelData->users = QList<QString>();
+    connection->SendJoinChannelRequest(channelData);
 }
 
 void MainClientWindow::SendByteArray(QByteArray *array)
 {
-    emit OnSendByteArray(array);
+    connection->SendByteArray(array);
 }
 
 void MainClientWindow::on_chatWindow_tabBarClicked(int index)
@@ -67,7 +76,7 @@ void MainClientWindow::on_button_send_clicked()
 
     ui->lineEdit_message->setText("");
 
-    emit OnSendMessage(message);
+    connection->SendMessage(message);
 }
 
 void MainClientWindow::RefreshUserList(int index)
@@ -110,24 +119,36 @@ void MainClientWindow::on_MainClientWindow_destroyed()
     emit OnClose();
 }
 
-void MainClientWindow::on_actionConnect_to_new_channel_triggered()
-{
-    StringPicker *channelNamePicker
-            = new StringPicker("New channel", "Pick new channel name", "Connect");
-    QObject::connect(channelNamePicker, SIGNAL(OnValuePicked(QString*)),
-                                      this, SLOT(ConnectToNewChannel(QString*)));
-    channelNamePicker->show();
-}
 
 void MainClientWindow::on_chatWindow_tabCloseRequested(int index)
 {
     // TODO disconnect from channel
 }
 
-void MainClientWindow::on_actionRaw_command_sender_triggered()
+//void MainClientWindow::on_actionRaw_command_sender_triggered()
+//{
+//    CommandSender *cmdSender = new CommandSender();
+//    QObject::connect(cmdSender, SIGNAL(OnSendCommand(QByteArray*)),
+//                     this, SLOT(SendByteArray(QByteArray*)));
+//    cmdSender->show();
+//}
+
+
+
+void MainClientWindow::on_actionCreate_new_channel_triggered()
 {
-    CommandSender *cmdSender = new CommandSender();
-    QObject::connect(cmdSender, SIGNAL(OnSendCommand(QByteArray*)),
-                     this, SLOT(SendByteArray(QByteArray*)));
-    cmdSender->show();
+    StringPicker *channelNamePicker
+            = new StringPicker("New channel", "Pick new channel name", "Create");
+    QObject::connect(channelNamePicker, SIGNAL(OnValuePicked(QString*)),
+                                      this, SLOT(CreateNewChannel(QString*)));
+    channelNamePicker->show();
+}
+
+void MainClientWindow::on_actionConnect_triggered()
+{
+    StringPicker *channelNamePicker
+            = new StringPicker("Connect", "Pick channel name", "Connect");
+    QObject::connect(channelNamePicker, SIGNAL(OnValuePicked(QString*)),
+                                      this, SLOT(JoinChannel(QString*)));
+    channelNamePicker->show();
 }

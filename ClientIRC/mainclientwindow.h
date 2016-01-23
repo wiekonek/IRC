@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "chatwidget.h"
+#include "connection.h"
 
 namespace Ui {
 class MainClientWindow;
@@ -13,16 +14,12 @@ class MainClientWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainClientWindow(IRCData::UserData *user, QWidget *parent = 0);
+    explicit MainClientWindow(Connection *connection,
+            IRCData::UserData *user, QWidget *parent = 0);
     ~MainClientWindow();
 
 signals:
     void OnClose();
-    void OnSendByteArray(QByteArray *array);
-    void OnSendMessage(IRCData::MessageData *messageData);
-    void OnCreateChannelRequest(IRCData::ChannelData *channelData);
-    void OnJoinChannelRequest(IRCData::ChannelData *channelData);
-    void OnLeaveChannel(IRCData::ChannelData *channelData);
 
 public slots:
     void AddChannelTab(IRCData::ChannelData *channelData);
@@ -30,7 +27,10 @@ public slots:
 
 
 private slots:
-    void ConnectToNewChannel(QString *channelName);
+    void ChannelCreatedPrompt();
+
+    void CreateNewChannel(QString *channelName);
+    void JoinChannel(QString *channelName);
     void SendByteArray(QByteArray *array);
 
     void on_chatWindow_tabBarClicked(int index);
@@ -38,9 +38,12 @@ private slots:
     void on_MainClientWindow_destroyed();
     void on_chatWindow_tabCloseRequested(int index);
 
-    void on_actionConnect_to_new_channel_triggered();
     void on_actionDisconnect_triggered();
-    void on_actionRaw_command_sender_triggered();
+
+
+    void on_actionCreate_new_channel_triggered();
+
+    void on_actionConnect_triggered();
 
 private:
     Ui::MainClientWindow *ui;
@@ -48,6 +51,7 @@ private:
     QTabWidget *tabbedPane;
     QList<ChatWidget*> channels;
     IRCData::UserData *user;
+    Connection *connection;
 
     void RefreshUserList(int index);
     ChatWidget *GetChannel(QString channelName);

@@ -125,16 +125,22 @@
     <property name="title">
      <string>Options</string>
     </property>
-    <addaction name="actionConnect_to_new_channel"/>
     <addaction name="actionDisconnect"/>
    </widget>
    <widget class="QMenu" name="menuDebug">
     <property name="title">
      <string>Debug</string>
     </property>
-    <addaction name="actionRaw_command_sender"/>
+   </widget>
+   <widget class="QMenu" name="menuChannels">
+    <property name="title">
+     <string>Channels</string>
+    </property>
+    <addaction name="actionCreate_new_channel"/>
+    <addaction name="actionConnect"/>
    </widget>
    <addaction name="menuOptions"/>
+   <addaction name="menuChannels"/>
    <addaction name="menuDebug"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -143,14 +149,14 @@
     <string>Close</string>
    </property>
   </action>
-  <action name="actionConnect_to_new_channel">
+  <action name="actionCreate_new_channel">
    <property name="text">
-    <string>Connect to new  channel</string>
+    <string>Create new channel</string>
    </property>
   </action>
-  <action name="actionRaw_command_sender">
+  <action name="actionConnect">
    <property name="text">
-    <string>Raw command sender</string>
+    <string>Connect</string>
    </property>
   </action>
  </widget>

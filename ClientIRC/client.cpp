@@ -59,24 +59,10 @@ void Client::LoggedIn(IRCData::UserData *userData)
     this->userData = userData;
     qDebug() << "Logged in as:" << userData->username;
 
-    mainWindow = new MainClientWindow(userData);
+    mainWindow = new MainClientWindow(connection, userData);
     mainWindow->show();
 
-    QObject::connect(mainWindow, SIGNAL(OnSendMessage(IRCData::MessageData*)),
-                     connection, SLOT(SendMessage(IRCData::MessageData*)));
     QObject::connect(mainWindow, SIGNAL(OnClose()), this, SLOT(Cleanup()));
-    QObject::connect(mainWindow, SIGNAL(OnCreateChannelRequest(IRCData::ChannelData*)),
-                     connection, SLOT(SendCreateChannelRequest(IRCData::ChannelData*)));
-    QObject::connect(mainWindow, SIGNAL(OnJoinChannelRequest(IRCData::ChannelData*)),
-                     connection, SLOT(SendJoinChannelRequest(IRCData::ChannelData*)));
-    QObject::connect(mainWindow, SIGNAL(OnLeaveChannel(IRCData::ChannelData*)),
-                     connection, SLOT(LeaveChannel(IRCData::ChannelData*)));
-    QObject::connect(connection, SIGNAL(OnConnectToChannel(IRCData::ChannelData*)),
-                     mainWindow, SLOT(AddChannelTab(IRCData::ChannelData*)));
-    QObject::connect(connection, SIGNAL(OnMessageReceived(IRCData::MessageData*)),
-                     mainWindow, SLOT(AddMessageToChannel(IRCData::MessageData*)));
-    QObject::connect(mainWindow, SIGNAL(OnSendByteArray(QByteArray*)),
-                     connection, SLOT(SendByteArray(QByteArray*)));
 }
 
 
