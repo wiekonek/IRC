@@ -70,6 +70,7 @@ void Connection::LeaveChannel(IRCData::ChannelData *channelData)
 void Connection::SendByteArray(QByteArray *array)
 {
     tcpSocket->write(*array);
+    qDebug(">Command send: \n>>%s", array);
 }
 
 void Connection::SendCommand(Message *message)
