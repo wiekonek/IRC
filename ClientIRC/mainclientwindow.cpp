@@ -145,17 +145,8 @@ void MainClientWindow::on_MainClientWindow_destroyed()
 void MainClientWindow::on_chatWindow_tabCloseRequested(int index)
 {
     // TODO disconnect from channel
+    index++;
 }
-
-//void MainClientWindow::on_actionRaw_command_sender_triggered()
-//{
-//    CommandSender *cmdSender = new CommandSender();
-//    QObject::connect(cmdSender, SIGNAL(OnSendCommand(QByteArray*)),
-//                     this, SLOT(SendByteArray(QByteArray*)));
-//    cmdSender->show();
-//}
-
-
 
 void MainClientWindow::on_actionCreate_new_channel_triggered()
 {
@@ -173,4 +164,12 @@ void MainClientWindow::on_actionConnect_triggered()
     QObject::connect(channelNamePicker, SIGNAL(OnValuePicked(QString*)),
                                       this, SLOT(JoinChannel(QString*)));
     channelNamePicker->show();
+}
+
+void MainClientWindow::on_actionRaw_commands_triggered()
+{
+        CommandSender *cmdSender = new CommandSender();
+        QObject::connect(cmdSender, SIGNAL(OnSendCommand(QByteArray*)),
+                         this, SLOT(SendByteArray(QByteArray*)));
+        cmdSender->show();
 }

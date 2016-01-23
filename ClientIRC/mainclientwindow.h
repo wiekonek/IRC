@@ -44,6 +44,8 @@ private slots:
     void on_actionCreate_new_channel_triggered();
     void on_actionConnect_triggered();
 
+    void on_actionRaw_commands_triggered();
+
 private:
     Ui::MainClientWindow *ui;
 

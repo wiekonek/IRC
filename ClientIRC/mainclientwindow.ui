@@ -131,6 +131,7 @@
     <property name="title">
      <string>Debug</string>
     </property>
+    <addaction name="actionRaw_commands"/>
    </widget>
    <widget class="QMenu" name="menuChannels">
     <property name="title">
@@ -157,6 +158,11 @@
   <action name="actionConnect">
    <property name="text">
     <string>Connect</string>
+   </property>
+  </action>
+  <action name="actionRaw_commands">
+   <property name="text">
+    <string>Raw commands</string>
    </property>
   </action>
  </widget>
