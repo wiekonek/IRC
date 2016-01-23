@@ -2,4 +2,4 @@ Debug
 *.o
 *~
 *.user
-
+*.autosave

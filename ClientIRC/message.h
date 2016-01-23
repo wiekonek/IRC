@@ -12,7 +12,8 @@
 #define CREATE_ACC 7
 #define JOIN_ACC 8
 #define LEAVE_ACC 9
-#define ERROR 20
+#define WELCOME 10
+#define ERROR
 
 #include <QJsonDocument>
 #include <QJsonObject>

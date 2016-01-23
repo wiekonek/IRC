@@ -1,7 +1,7 @@
 #ifndef LISTENER_H
 #define LISTENER_H
 
-#define LISTENER_PORT 9999
+#define LISTENER_PORT 6666
 #define LISTENER_QUEUE_SIZE 20
 
 #include <QObject>

@@ -28,3 +28,8 @@ void LoginDialog::on_button_quit_clicked()
     emit OnClose();
     this->close();
 }
+
+void LoginDialog::AcceptUser()
+{
+
+}

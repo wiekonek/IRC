@@ -6,7 +6,6 @@ Client::Client(QObject *parent) : QObject(parent)
 {
     PickServerDialog *pickServer = new PickServerDialog();
     pickServer->show();
-
     QObject::connect(pickServer, SIGNAL(OnConnect(Connection*)),
                      this, SLOT(Connect(Connection*)));
 
@@ -18,12 +17,8 @@ Client::~Client()
 {
     delete connection;
     delete userData;
-    if(mainWindow != NULL)
-        mainWindow->close();
     delete mainWindow;
     this->~QObject();
-
-    qDebug("Cleaning!");
 }
 
 void Client::Connect(Connection *connection)
@@ -32,9 +27,6 @@ void Client::Connect(Connection *connection)
     qDebug("Connected!");
     this->connection = connection;
 
-
-    QObject::connect(connection, SIGNAL(OnMessageReceived(Message*)),
-                     this, SLOT(MessageReceived(Message*)));
     QObject::connect(connection, SIGNAL(OnConnectionLost()),
                      this, SLOT(Disconnect()));
 
@@ -60,10 +52,7 @@ void Client::Disconnect()
 
 void Client::Cleanup()
 {
-    if(mainWindow != NULL)
-        mainWindow->close();
     qDebug("Cleaning");
-    delete this;
 }
 
 void Client::LoggedIn(IRCData::UserData *userData)
@@ -97,12 +86,8 @@ void Client::LoggedIn(IRCData::UserData *userData)
     IRCData::ChannelData *secondChannel = new IRCData::ChannelData();
     secondChannel->name = "Admin second channel";
     secondChannel->users.append("admin");
-    secondChannel->users.append("scondTestUser");
+    secondChannel->users.append("secondTestUser");
     mainWindow->AddChannelTab(secondChannel);
 }
 
-void Client::MessageReceived(Message *message)
-{
-    // TODO
-}
 

@@ -14,13 +14,13 @@ class Connection : public QObject
 {
     Q_OBJECT
 public:
-    static const QString KEY_CMD;
-    static const QString KEY_USER;
-    static const QString KEY_PUBLIC;
-    static const QString KEY_PASSWORD;
-    static const QString KEY_TEXT;
-    static const QString KET_TYPE;
-    static const QString KEY_CHANNEL;
+//    static const QString KEY_CMD;
+//    static const QString KEY_USER;
+//    static const QString KEY_PUBLIC;
+//    static const QString KEY_PASSWORD;
+//    static const QString KEY_TEXT;
+//    static const QString KEY_TYPE;
+//    static const QString KEY_CHANNEL;
 
     explicit Connection(QTcpSocket *tcpSocket, QObject *parent = 0);
 

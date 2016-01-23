@@ -6,10 +6,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-
     new Client();
-
-
-
-    return a.exec();
+    a.exec();
+//    return a.exec();
 }

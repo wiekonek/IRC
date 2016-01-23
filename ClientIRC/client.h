@@ -21,7 +21,6 @@ public slots:
     void Disconnect();
     void Cleanup();
     void LoggedIn(IRCData::UserData *userData);
-    void MessageReceived(Message *message);
 
 private:
     Connection *connection;
