@@ -15,72 +15,69 @@ Server* Server::getInstance() // statyczna klasa signleton
 
 Channel* Server::Create(Connection* connection, QString channel_name)
 {
-    if(Find(channel_name) == NULL)
+    if(FindChannel(channel_name) == NULL && channel_name.size() > 0)
     {
         Channel* channel = new Channel(channel_name);
         addChannel(channel);
-        SendConfirm(connection, CREATE_ACC, 1);
+        SendConfirm(connection, CREATE_ACC, 1, channel_name);
         return channel;
     }
     else
     {
-        SendConfirm(connection, CREATE_ACC, 0);
+        SendConfirm(connection, CREATE_ACC, 0, channel_name);
         return NULL;
     }
 }
 
 Channel* Server::Join(Connection* connection, QString channel_name)
 {
-    Channel* channel = Find(channel_name);
+    Channel* channel = FindChannel(channel_name);
     if(channel != NULL)
     {
         channel->Add(connection);
-        SendConfirm(connection, JOIN_ACC, 1);
+        SendConfirm(connection, JOIN_ACC, 1, channel_name);
     }
     else
     {
         qDebug("JOIN::kanal nie istnieje");
-        SendConfirm(connection, JOIN_ACC, 0);
+        SendConfirm(connection, JOIN_ACC, 0, channel_name);
     }
     return channel;
 }
 
 void Server::Leave(Connection* connection, QString channel_name)
 {
-    Channel* channel = Find(channel_name);
+    Channel* channel = FindChannel(channel_name);
     if(channel != NULL)
     {
         channel->Remove(connection);
-        SendConfirm(connection, LEAVE_ACC, 1);
+        SendConfirm(connection, LEAVE_ACC, 1, channel_name);
     }
     else
     {
         qDebug("LEAVE::kanal nie istnieje ");
-        SendConfirm(connection, LEAVE_ACC, 0);
+        SendConfirm(connection, LEAVE_ACC, 0, channel_name);
     }
 }
 
 void Server::Send(Connection* sender, QString channel_name, QString text)
 {
-    Channel* channel = Find(channel_name);
+    Channel* channel = FindChannel(channel_name);
     if(channel != NULL)
     {
         for(Connection* connection : channel->GetConnections())
         {
-            if(connection != sender) //niech stworzy sie wiele kopi tego obiektu, connection->Send() je niszczy
-            {
-                Message* message = new Message();
-                message->add("user", sender->GetName());
-                message->add("text", text);
-                message->add("command", MESSAGE);
-                message->add("channel", channel_name);
-                connection->Send(message);
-            }
+            Message* message = new Message();
+            message->add("user", sender->GetName());
+            message->add("text", text);
+            message->add("command", MESSAGE);
+            message->add("channel", channel_name);
+            connection->Send(message);
         }
     }
     else
     {
-        qDebug("wyslano wiadomosc do nie istniejacego kanalu...");
+        qDebug("wyslano wiadomosc do nieistniejacego kanalu...");
     }
 }
 
@@ -99,11 +96,15 @@ void Server::Disconnect(Connection *connection)
     }
 }
 
-void Server::SendConfirm(Connection *connection, int command, int value)
+void Server::SendConfirm(Connection *connection, int command, int value, QString channel_name)
 {
     Message* message = new Message();
     message->add("command", command);
     message->add("value", value);
+    if(channel_name.size() > 0)
+    {
+        message->add("channel", channel_name);
+    }
     connection->Send(message);
 }
 
@@ -139,7 +140,7 @@ void Server::removeConnection(Connection *connection)
     Erase(active_connection, connection);
 }
 
-Channel* Server::Find(QString name)
+Channel* Server::FindChannel(QString name)
 {
     vector<Channel*> *channels = &public_channels;
     for(Channel* channel : *channels)

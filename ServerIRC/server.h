@@ -42,7 +42,7 @@ public:
      void Send(Connection* sender, QString channel_name, QString text);
      void Login(Connection* connection, QString name);
      void Disconnect(Connection* connection);
-     void SendConfirm(Connection* connection, int command, int value);
+     void SendConfirm(Connection* connection, int command, int value, QString channel_name = "");
 
      void PrintPublicChannels();
 signals:
@@ -57,7 +57,8 @@ public slots:
     void readMessage(Message *message);
 
 private:
-    Channel* Find(QString name);
+    Channel* FindChannel(QString name);
+    Connection* FindConnection(QString name);
     void Print(vector<Channel *> channels);
 
     Connection *activeConnections[MAX_CONNECTIONS];
