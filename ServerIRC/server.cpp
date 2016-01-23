@@ -13,9 +13,9 @@ Server* Server::getInstance() // statyczna klasa signleton
     return &instance;
 }
 
-Channel* Server::Create(Connection* connection, QString channel_name, int ispublic, QString password)
+Channel* Server::Create(Connection* connection, QString channel_name, int ispublic)
 {
-    Channel* channel = new Channel(channel_name, ispublic, password);
+    Channel* channel = new Channel(channel_name, ispublic);
     int err = addChannel(channel);
     if(err == 0)
     {
@@ -29,7 +29,7 @@ Channel* Server::Create(Connection* connection, QString channel_name, int ispubl
     return channel;
 }
 
-Channel* Server::Join(Connection* connection, QString channel_name, QString password, int ispublic)
+Channel* Server::Join(Connection* connection, QString channel_name, int ispublic)
 {
     Channel* channel = Find(channel_name, ispublic);
     if(ispublic == 1)
@@ -40,7 +40,7 @@ Channel* Server::Join(Connection* connection, QString channel_name, QString pass
     else
     {
         Confirm(connection, JOIN_ACC, 0);
-        int err = channel->Add(connection, password);
+        int err = channel->Add(connection);
         if(err != 0)
             qDebug("odrzucono - zaimplementuj join");
     }
@@ -196,8 +196,8 @@ int Server::GetFreePortNumber()
 
 void Server::readMessage(Message* message)
 {
-   // message->printAll();
-    message->add("password", "");
+    //message->printAll();
+    //message->add("password", "");
     Connection* connection = (Connection*)QObject::sender();
     if(connection == NULL)
     {
@@ -216,14 +216,12 @@ void Server::readMessage(Message* message)
         case CREATE:
             Create(connection,
                    message->getValue("channel"),
-                   message->getValue("public").toInt(),
-                   message->getValue("password"));
+                   message->getValue("public").toInt());
             break;
 
         case JOIN:
             Join(connection,
                  message->getValue("channel"),
-                 message->getValue("password"),
                  message->getValue("public").toInt());
             break;
 

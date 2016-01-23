@@ -36,8 +36,8 @@ public:
      Server(QObject* parent=0);
      static Server* getInstance();
 
-     Channel* Create(Connection* connection, QString channel_name, int ispublic = 1, QString password = "");
-     Channel* Join(Connection *connection, QString channel_name, QString password = "", int ispublic = true);
+     Channel* Create(Connection* connection, QString channel_name, int ispublic = 1);
+     Channel* Join(Connection *connection, QString channel_name, int ispublic = true);
      void Leave(Connection* connection, QString channel_name);
      void Send(Connection* sender, QString channel_name, QString text);
      void Login(Connection* connection, QString name);

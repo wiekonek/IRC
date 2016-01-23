@@ -34,10 +34,13 @@ void* Connection::MainLoop()
     while(working)
     {
         char buf[BUF_SIZE];
+        ClearArray(buf);
         int recv_size = SocketManager::ReadNoWait(client_socket, buf, BUF_SIZE);
 
         if(recv_size > 0)
         {
+            qDebug("otrzymano");
+            qDebug(buf);
             InputManage(buf);
         }
         else if(recv_size == 0)
@@ -138,6 +141,14 @@ void Connection::SetName(char* name)
 {
     QString buf_name(name);
     SetName(buf_name);
+}
+
+void Connection::ClearArray(char *array)
+{
+    for(int i=0; i<BUF_SIZE; i++)
+    {
+        array[i] = '\0';
+    }
 }
 
 void* Connection::Connect2Thread(void *arg)

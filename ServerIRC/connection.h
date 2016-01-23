@@ -38,6 +38,7 @@ private:
     void* MainLoop();
     void InputManage(char* buf);
     int OutputManage();
+    void ClearArray(char* array);
     static void* Connect2Thread(void *arg);
     static void SigpipeHandler(int signo);
 
