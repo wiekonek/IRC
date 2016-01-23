@@ -22,7 +22,7 @@ signals:
     void OnSendLoginRequest(IRCData::UserData *userData);
 
 public slots:
-    void AcceptUser();
+    void AcceptUser(bool *ok);
 
 private slots:
     void on_button_login_clicked();
@@ -30,8 +30,7 @@ private slots:
 
 private:
     Ui::LoginDialog *ui;
-
-
+    IRCData::UserData *userData;
 };
 
 #endif // LOGINDIALOG_H

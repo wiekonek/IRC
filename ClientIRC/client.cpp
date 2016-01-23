@@ -23,7 +23,6 @@ Client::~Client()
 
 void Client::Connect(Connection *connection)
 {
-    // TODO: hehe
     qDebug("Connected!");
     this->connection = connection;
 
@@ -40,8 +39,8 @@ void Client::Connect(Connection *connection)
     QObject::connect(loginDialog,
                      SIGNAL(OnSendLoginRequest(IRCData::UserData*)),
                      connection, SLOT(SendLoginRequest(IRCData::UserData*)));
-    QObject::connect(connection, SIGNAL(OnAcceptUser()), loginDialog,
-                     SLOT(AcceptUser()));
+    QObject::connect(connection, SIGNAL(OnAcceptUser(bool*)), loginDialog,
+                     SLOT(AcceptUser(bool*)));
 }
 
 void Client::Disconnect()
@@ -66,7 +65,9 @@ void Client::LoggedIn(IRCData::UserData *userData)
     QObject::connect(mainWindow, SIGNAL(OnSendMessage(IRCData::MessageData*)),
                      connection, SLOT(SendMessage(IRCData::MessageData*)));
     QObject::connect(mainWindow, SIGNAL(OnClose()), this, SLOT(Cleanup()));
-    QObject::connect(mainWindow, SIGNAL(OnJoinChannelRequest(IRCData::MessageData*)),
+    QObject::connect(mainWindow, SIGNAL(OnCreateChannelRequest(IRCData::ChannelData*)),
+                     connection, SLOT(SendCreateChannelRequest(IRCData::ChannelData*)));
+    QObject::connect(mainWindow, SIGNAL(OnJoinChannelRequest(IRCData::ChannelData*)),
                      connection, SLOT(SendJoinChannelRequest(IRCData::ChannelData*)));
     QObject::connect(mainWindow, SIGNAL(OnLeaveChannel(IRCData::ChannelData*)),
                      connection, SLOT(LeaveChannel(IRCData::ChannelData*)));
@@ -75,19 +76,6 @@ void Client::LoggedIn(IRCData::UserData *userData)
                      mainWindow, SLOT(AddChannelTab(IRCData::ChannelData*)));
     QObject::connect(connection, SIGNAL(OnMessageReceived(IRCData::MessageData*)),
                      mainWindow, SLOT(AddMessageToChannel(IRCData::MessageData*)));
-
-
-    IRCData::ChannelData *newChannel = new IRCData::ChannelData();
-    newChannel->name = "Admin test channel";
-    newChannel->users.append("admin");
-    newChannel->users.append("testUser");
-    mainWindow->AddChannelTab(newChannel);
-
-    IRCData::ChannelData *secondChannel = new IRCData::ChannelData();
-    secondChannel->name = "Admin second channel";
-    secondChannel->users.append("admin");
-    secondChannel->users.append("secondTestUser");
-    mainWindow->AddChannelTab(secondChannel);
 }
 
 

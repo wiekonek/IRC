@@ -3,14 +3,6 @@
 #include <QtNetwork>
 #include <QMessageBox>
 
-//const QString Connection::KEYS::CMD = "command";
-//const QString Connection::KEYS::USER = "user";
-//const QString Connection::KEYS::PUBLIC = "public";
-//const QString Connection::KEYS::PASSWORD = "password";
-//const QString Connection::KEYS::TEXT = "text";
-//const QString Connection::KEYS::TYPE = "type";
-//const QString Connection::KEYS::CHANNEL = "channel";
-
 Connection::Connection(QTcpSocket *tcpSocket, QObject *parent) : QObject(parent)
 {
     this->tcpSocket = tcpSocket;
@@ -19,18 +11,13 @@ Connection::Connection(QTcpSocket *tcpSocket, QObject *parent) : QObject(parent)
     connect(tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(Error(QAbstractSocket::SocketError)));
 
-    qDebug() << "<New connection>"
-             << "\n  host:" << tcpSocket->localAddress().toString()
-             << "\n  local port: " << tcpSocket->localPort();
+    qDebug() << ">New connection>"
+             << "\n>>host:" << tcpSocket->localAddress().toString()
+             << "\n>>local port: " << tcpSocket->localPort();
 }
 
 void Connection::SendMessage(IRCData::MessageData *message)
 {
-    qDebug() << "<Send message>"
-             << "\n  channel:" << message->channelName
-             << "\n  username:" <<message->username
-             << "\n  content:" <<message->content;
-
     Message *msg = new Message();
     msg->add(KEYS::CMD, MESSAGE);
     msg->add(KEYS::CHANNEL, message->channelName);
@@ -49,6 +36,15 @@ void Connection::SendLoginRequest(IRCData::UserData *userData)
 
     SendCommand(msg);
     delete msg;
+}
+
+void Connection::SendCreateChannelRequest(IRCData::ChannelData *channelData)
+{
+    Message *msg = new Message();
+    msg->add(KEYS::CMD, CREATE);
+    msg->add(KEYS::CHANNEL, channelData->name);
+
+    SendCommand(msg);
 }
 
 void Connection::SendJoinChannelRequest(IRCData::ChannelData *channelData)
@@ -70,21 +66,19 @@ void Connection::LeaveChannel(IRCData::ChannelData *channelData)
     SendCommand(msg);
     delete msg;
 }
-///
-/// \brief Connection::SendCommand
-/// \param message
-///
+
 void Connection::SendCommand(Message *message)
 {
     tcpSocket->write(message->toByte());
+
 }
 
 void Connection::ReadyToRead()
 {
     // TODO read from socket
     QByteArray dataArray = tcpSocket->readAll();
-    qDebug() << "<<<<<<" << dataArray;
     Message *msg = new Message(dataArray);
+    qDebug(">Command received: \n>>%s", msg->toChar());
     QString command = msg->getValue(KEYS::CMD);
 
     IRCData::MessageData *message;
@@ -94,10 +88,21 @@ void Connection::ReadyToRead()
 
         break;
     case LOGIN_ACC:
-
+    {
+        QString str = msg->getValue(KEYS::VALUE);
+        bool *ok = new bool();
+        *ok = str.toInt() == 0 ?  false : true;
+        emit OnAcceptUser(ok);
+    }
         break;
     case JOIN_ACC:
-
+    {
+        IRCData::ChannelData *channel = new IRCData::ChannelData();
+        channel->name = msg->getValue(KEYS::CHANNEL);
+        channel->users.append("admin");
+        channel->users.append("user");
+        emit OnConnectToChannel(channel);
+    }
         break;
     case LEAVE_ACC:
 
@@ -110,13 +115,11 @@ void Connection::ReadyToRead()
         message->channelName = msg->getValue(KEYS::CHANNEL);
         message->content = msg->getValue(KEYS::TEXT);
         message->username = msg->getValue(KEYS::USER);
-        OnMessageReceived(message);
+        emit OnMessageReceived(message);
         break;
 //    case ERROR:
 
 //        break;
-    default:
-        break;
     }
 
 }

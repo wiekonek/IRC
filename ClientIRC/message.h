@@ -1,20 +1,6 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
-#define LOGIN 0
-#define CREATE 1
-#define JOIN 2
-#define LEAVE 3
-#define MESSAGE 4
-#define DISCONNECT 5
-
-#define LOGIN_ACC 6
-#define CREATE_ACC 7
-#define JOIN_ACC 8
-#define LEAVE_ACC 9
-#define WELCOME 10
-#define ERROR
-
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>

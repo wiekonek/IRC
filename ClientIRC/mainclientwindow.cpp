@@ -2,6 +2,7 @@
 #include "ui_mainclientwindow.h"
 #include "chatwidget.h"
 #include <QStandardItemModel>
+#include "stringpicker.h"
 
 MainClientWindow::MainClientWindow(IRCData::UserData *user, QWidget *parent) :
     QMainWindow(parent),
@@ -27,14 +28,6 @@ void MainClientWindow::AddChannelTab(IRCData::ChannelData *channel)
     tabbedPane->addTab(newTab, channel->name);
     channels.append(newTab);
 
-    IRCData::MessageData message;
-    message.channelName = channel->name;
-    message.username = user->username;
-    message.content = "Join to channel!";
-
-    AddMessageToChannel(&message);
-    AddMessageToChannel(&message);
-
     RefreshUserList(0);
 }
 
@@ -44,9 +37,18 @@ void MainClientWindow::AddMessageToChannel(IRCData::MessageData *messageData)
     widget->AddMessage(messageData);
 }
 
+void MainClientWindow::ConnectToNewChannel(QString *channelName)
+{
+    IRCData::ChannelData *channelData = new IRCData::ChannelData();
+    channelData->name = *channelName;
+    QList<QString> *userList = new QList<QString>();
+    userList->append(user->username);
+    channelData->users = *userList;
+    emit OnCreateChannelRequest(channelData);
+}
+
 void MainClientWindow::on_chatWindow_tabBarClicked(int index)
 {
-    // TODO
     RefreshUserList(index);
 }
 
@@ -73,7 +75,6 @@ void MainClientWindow::RefreshUserList(int index)
     for(int i = 0; i < channelData->users.size(); i++)
         model->appendRow(new QStandardItem(channelData->users[i]));
     ui->listView_channelUsers->setModel(model);
-
 }
 
 ChatWidget *MainClientWindow::GetChannel(QString channelName)
@@ -101,4 +102,18 @@ void MainClientWindow::on_actionDisconnect_triggered()
 void MainClientWindow::on_MainClientWindow_destroyed()
 {
     emit OnClose();
+}
+
+void MainClientWindow::on_actionConnect_to_new_channel_triggered()
+{
+    StringPicker *channelNamePicker
+            = new StringPicker("New channel", "Pick new channel name", "Connect");
+    QObject::connect(channelNamePicker, SIGNAL(OnValuePicked(QString*)),
+                                      this, SLOT(ConnectToNewChannel(QString*)));
+    channelNamePicker->show();
+}
+
+void MainClientWindow::on_chatWindow_tabCloseRequested(int index)
+{
+    // TODO disconnect from channel
 }

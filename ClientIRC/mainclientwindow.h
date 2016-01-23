@@ -19,7 +19,8 @@ public:
 signals:
     void OnClose();
     void OnSendMessage(IRCData::MessageData *messageData);
-    void OnJoinChannelRequest(IRCData::MessageData *messageData);
+    void OnCreateChannelRequest(IRCData::ChannelData *channelData);
+    void OnJoinChannelRequest(IRCData::ChannelData *channelData);
     void OnLeaveChannel(IRCData::ChannelData *channelData);
 
 public slots:
@@ -28,10 +29,16 @@ public slots:
 
 
 private slots:
+    void ConnectToNewChannel(QString *channelName);
+
     void on_chatWindow_tabBarClicked(int index);
     void on_button_send_clicked();
-    void on_actionDisconnect_triggered();
     void on_MainClientWindow_destroyed();
+
+    void on_actionConnect_to_new_channel_triggered();
+    void on_actionDisconnect_triggered();
+
+    void on_chatWindow_tabCloseRequested(int index);
 
 private:
     Ui::MainClientWindow *ui;

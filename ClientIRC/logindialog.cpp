@@ -1,11 +1,13 @@
 #include "logindialog.h"
 #include "ui_logindialog.h"
+#include <QMessageBox>
 
 LoginDialog::LoginDialog(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::LoginDialog)
 {
     ui->setupUi(this);
+    userData = new IRCData::UserData();
 }
 
 LoginDialog::~LoginDialog()
@@ -14,13 +16,9 @@ LoginDialog::~LoginDialog()
 }
 void LoginDialog::on_button_login_clicked()
 {
-// TODO zalogowac sieeeee
-
-    IRCData::UserData *userData = new IRCData::UserData();
     userData->username = ui->lineEdit_username->text();
     userData->perrmission = ui->lineEdit_password->text();
-    emit OnLoggedIn(userData);
-    this->close();
+    emit OnSendLoginRequest(userData);
 }
 
 void LoginDialog::on_button_quit_clicked()
@@ -29,7 +27,12 @@ void LoginDialog::on_button_quit_clicked()
     this->close();
 }
 
-void LoginDialog::AcceptUser()
+void LoginDialog::AcceptUser(bool *ok)
 {
-
+    if(*ok) {
+        emit OnLoggedIn(userData);
+        this->close();
+    } else
+        QMessageBox::warning(this, "IRC Client",
+                             "Check login and password.");
 }

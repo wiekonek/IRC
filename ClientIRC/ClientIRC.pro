@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     connection.cpp \
     logindialog.cpp \
     message.cpp \
-    chatwidget.cpp
+    chatwidget.cpp \
+    stringpicker.cpp
 
 HEADERS  += mainclientwindow.h \
     pickserverdialog.h \
@@ -28,11 +29,13 @@ HEADERS  += mainclientwindow.h \
     logindialog.h \
     message.h \
     chatwidget.h \
-    datastructures.h
+    datastructures.h \
+    stringpicker.h
 
 FORMS    += mainclientwindow.ui \
     pickserverdialog.ui \
     logindialog.ui \
-    chatwidget.ui
+    chatwidget.ui \
+    stringpicker.ui
 
 DISTFILES +=
