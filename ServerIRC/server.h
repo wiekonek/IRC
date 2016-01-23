@@ -36,21 +36,19 @@ public:
      Server(QObject* parent=0);
      static Server* getInstance();
 
-     Channel* Create(Connection* connection, QString channel_name, int ispublic = 1);
-     Channel* Join(Connection *connection, QString channel_name, int ispublic = true);
+     Channel* Create(Connection* connection, QString channel_name);
+     Channel* Join(Connection *connection, QString channel_name);
      void Leave(Connection* connection, QString channel_name);
      void Send(Connection* sender, QString channel_name, QString text);
      void Login(Connection* connection, QString name);
      void Disconnect(Connection* connection);
-     void Confirm(Connection* connection, int command, int value);
+     void SendConfirm(Connection* connection, int command, int value);
 
-     void PrintAllChannels();
      void PrintPublicChannels();
-     void PrintPrivatechannels();
 signals:
 
 public slots:
-    int  addChannel(Channel *channel, int ispublic = 1);
+    int  addChannel(Channel *channel);
     void removeChannel(Channel *channel);
 
     void addConnection(Connection *connection);
@@ -59,13 +57,12 @@ public slots:
     void readMessage(Message *message);
 
 private:
-    Channel* Find(QString name, int ispublic = true);
+    Channel* Find(QString name);
     void Print(vector<Channel *> channels);
 
     Connection *activeConnections[MAX_CONNECTIONS];
 
     vector<Channel *> public_channels;
-    vector<Channel *> private_channels;
     vector<Connection *>  active_connection;
     int GetFreePortNumber();
 };
