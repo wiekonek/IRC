@@ -85,54 +85,59 @@ void Connection::ReadyToRead()
 {
     // TODO read from socket
     QByteArray dataArray = tcpSocket->readAll();
-    Message *msg = new Message(dataArray);
-    qDebug(">Command received: \n>>%s", msg->toChar());
-    QString command = msg->getValue(KEYS::CMD);
-
-    IRCData::MessageData *message;
-
-    switch (command.toInt()) {
-    case WELCOME:
-
-        break;
-    case LOGIN_ACC:
+    QList<QByteArray> messageList = dataArray.split('\4');
+    messageList.removeAll("");
+    foreach(QByteArray byteMessage, messageList)
     {
-        QString str = msg->getValue(KEYS::VALUE);
-        bool *ok = new bool();
-        *ok = str.toInt() == 0 ?  false : true;
-        emit OnAcceptUser(ok);
-    }
-        break;
-    case JOIN_ACC:
-    {
-        IRCData::ChannelData *channel = new IRCData::ChannelData();
-        channel->name = msg->getValue(KEYS::CHANNEL);
-        channel->users.append("admin");
-        channel->users.append("user");
-        emit OnConnectToChannel(channel);
-    }
-        break;
-    case LEAVE_ACC:
-        emit OnLeaveChannel(new IRCData::ChannelData());
-        break;
-    case CREATE_ACC:
-    {
-        bool ok = false;
-        if(msg->getValue(KEYS::VALUE).toInt() == 1)
-            ok = true;
-        emit OnCreateChannel(&ok);
-    }
-        break;
-    case MESSAGE:
-        message = new IRCData::MessageData();
-        message->channelName = msg->getValue(KEYS::CHANNEL);
-        message->content = msg->getValue(KEYS::TEXT);
-        message->username = msg->getValue(KEYS::USER);
-        emit OnMessageReceived(message);
-        break;
-//    case ERROR:
+        Message *msg = new Message(byteMessage);
+        qDebug(">Command received: \n>>%s", msg->toChar());
+        QString command = msg->getValue(KEYS::CMD);
 
-//        break;
+        IRCData::MessageData *message;
+
+        switch (command.toInt()) {
+        case WELCOME:
+
+            break;
+        case LOGIN_ACC:
+        {
+            QString str = msg->getValue(KEYS::VALUE);
+            bool *ok = new bool();
+            *ok = str.toInt() == 0 ?  false : true;
+            emit OnAcceptUser(ok);
+        }
+            break;
+        case JOIN_ACC:
+        {
+            IRCData::ChannelData *channel = new IRCData::ChannelData();
+            channel->name = msg->getValue(KEYS::CHANNEL);
+            channel->users.append("admin");
+            channel->users.append("user");
+            emit OnConnectToChannel(channel);
+        }
+            break;
+        case LEAVE_ACC:
+            emit OnLeaveChannel(new IRCData::ChannelData());
+            break;
+        case CREATE_ACC:
+        {
+            bool ok = false;
+            if(msg->getValue(KEYS::VALUE).toInt() == 1)
+                ok = true;
+            emit OnCreateChannel(&ok);
+        }
+            break;
+        case MESSAGE:
+            message = new IRCData::MessageData();
+            message->channelName = msg->getValue(KEYS::CHANNEL);
+            message->content = msg->getValue(KEYS::TEXT);
+            message->username = msg->getValue(KEYS::USER);
+            emit OnMessageReceived(message);
+            break;
+    //    case ERROR:
+
+    //        break;
+        }
     }
 
 }
