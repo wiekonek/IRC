@@ -75,7 +75,9 @@ void Connection::SendByteArray(QByteArray *array)
 
 void Connection::SendCommand(Message *message)
 {
-    tcpSocket->write(message->toByte());
+    QByteArray array = message->toByte();
+    array.append('\4');
+    tcpSocket->write(array);
     qDebug(">Command send: \n>>%s", message->toChar());
 }
 
