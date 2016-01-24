@@ -52,9 +52,9 @@ int SocketManager::Accept(sockaddr_in &clientAddress, int listenerSocket)
 
 int SocketManager::Write(int destinationSocket, const char *message, int buffSize)
 {
-    char buffer[buffSize];
+    char buffer[buffSize+2];
     int n;
-    n = sprintf(buffer, "%s", message);
+    n = sprintf(buffer, "%s\4", message);
     int size = write(destinationSocket, buffer, n);
     return size;
 }
