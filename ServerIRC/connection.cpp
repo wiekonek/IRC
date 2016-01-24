@@ -72,8 +72,8 @@ void Connection::InputManage(char *transmission)
     QStringList messages = buffer->split('\4');
     for(int i=0; i<messages.size(); i++)
     {
-        qDebug("analizuje.. %d", i);
-        qDebug("%s", (messages[i]).toStdString().c_str());
+        //qDebug("analizuje.. %d", i);
+        //qDebug("%s", (messages[i]).toStdString().c_str());
         if(messages[i] != "")
         {
             Message* message = new Message((messages[i]).toStdString().c_str());
@@ -116,7 +116,7 @@ int Connection::OutputManage()
 void Connection::HandleWrongMessage()
 {
     char buf[1];
-    qDebug("otrzymano zbyt dluga wiadomosc");
+    qDebug("recieved too long message");
     while(true)
     {
         ClearArray(buf, 1);

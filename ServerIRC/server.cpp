@@ -7,7 +7,7 @@ Server::Server(QObject *parent) : QObject(parent)
 
 }
 
-Server* Server::getInstance() // statyczna klasa signleton
+Server* Server::getInstance() // signleton
 {
     static Server instance;
     return &instance;
@@ -39,7 +39,7 @@ Channel* Server::Join(Connection* connection, QString channel_name)
     }
     else
     {
-        qDebug("JOIN::kanal nie istnieje");
+        qDebug("JOIN::channel doesn't exist");
         SendConfirm(connection, JOIN_ACC, 0, channel_name);
     }
     return channel;
@@ -55,7 +55,7 @@ void Server::Leave(Connection* connection, QString channel_name)
     }
     else
     {
-        qDebug("LEAVE::kanal nie istnieje ");
+        qDebug("LEAVE::channel doesn't exist");
         SendConfirm(connection, LEAVE_ACC, 0, channel_name);
     }
 }
@@ -77,7 +77,7 @@ void Server::Send(Connection* sender, QString channel_name, QString text)
     }
     else
     {
-        qDebug("wyslano wiadomosc do nieistniejacego kanalu...");
+        qDebug("tried to send message to not existing channel");
     }
 }
 
