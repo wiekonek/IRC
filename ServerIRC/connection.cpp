@@ -39,7 +39,11 @@ void* Connection::MainLoop()
         ClearArray(buf);
         int recv_size = SocketManager::ReadNoWait(client_socket, buf, BUF_SIZE);
 
-        if(recv_size > 0)
+        if( recv_size >= BUF_SIZE && (buf[BUF_SIZE - 1] != '\4' || buf[BUF_SIZE - 1] != '\0') )
+        {
+            HandleWrongMessage();
+        }
+        else if(recv_size > 0)
         {
             qDebug("otrzymano");
             qDebug(buf);
@@ -68,6 +72,8 @@ void Connection::InputManage(char *transmission)
     QStringList messages = buffer->split('\4');
     for(int i=0; i<messages.size(); i++)
     {
+        qDebug("analizuje.. %d", i);
+        qDebug("%s", (messages[i]).toStdString().c_str());
         if(messages[i] != "")
         {
             Message* message = new Message((messages[i]).toStdString().c_str());
@@ -105,6 +111,21 @@ int Connection::OutputManage()
         return size;
     }
     return 0;
+}
+
+void Connection::HandleWrongMessage()
+{
+    char buf[1];
+    qDebug("otrzymano zbyt dluga wiadomosc");
+    while(true)
+    {
+        ClearArray(buf, 1);
+        int recv_size = SocketManager::ReadNoWait(client_socket, buf, 1);
+        if(buf[0] == '\4' || buf[0] == '\0')
+            break;
+        if(recv_size == 0)
+            break;
+    }
 }
 
 void Connection::Send(Message *messsage)
@@ -146,9 +167,9 @@ void Connection::SetName(char* name)
     SetName(buf_name);
 }
 
-void Connection::ClearArray(char *array)
+void Connection::ClearArray(char *array, int size)
 {
-    for(int i=0; i<BUF_SIZE; i++)
+    for(int i=0; i<size; i++)
     {
         array[i] = '\0';
     }

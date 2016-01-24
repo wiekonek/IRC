@@ -1,7 +1,7 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-#define BUF_SIZE 2000
+#define BUF_SIZE 4096
 
 #include <QObject>
 #include <pthread.h>
@@ -39,7 +39,8 @@ private:
     void* MainLoop();
     void InputManage(char* buf);
     int OutputManage();
-    void ClearArray(char* array);
+    void HandleWrongMessage();
+    void ClearArray(char* array, int size = BUF_SIZE);
     static void* Connect2Thread(void *arg);
     static void SigpipeHandler(int signo);
 
