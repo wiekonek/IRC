@@ -12,6 +12,7 @@ const QString TEXT = "text";
 const QString TYPE = "type";
 const QString CHANNEL = "channel";
 const QString VALUE = "value";
+const QString USERS = "list";
 }
 
 namespace IRCData {

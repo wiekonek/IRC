@@ -13,7 +13,9 @@
 #define JOIN_ACC 8
 #define LEAVE_ACC 9
 #define WELCOME 10
-#define ERROR
+#define USER_LIST 11
+#define ERROR 20
+
 
 #include <QObject>
 #include <QtNetwork>
@@ -35,6 +37,7 @@ signals: //messages from server
     void OnCreateChannel(bool *ok);
     void OnLeaveChannel(IRCData::ChannelData *channelData);
     void OnConnectionLost();
+    void OnNewUserList(IRCData::ChannelData *channelData);
     void OnError();
 
 public slots: //messages to server

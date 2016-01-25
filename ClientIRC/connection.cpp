@@ -127,6 +127,14 @@ void Connection::ReadyToRead()
             emit OnCreateChannel(&ok);
         }
             break;
+        case USER_LIST:
+        {
+            IRCData::ChannelData *channelData = new IRCData::ChannelData();
+            channelData->name = msg->getList(KEYS::CHANNEL);
+            channelData->users = msg->getList(KEYS::USERS);
+            emit OnNewUserList(channelData);
+        }
+            break;
         case MESSAGE:
             message = new IRCData::MessageData();
             message->channelName = msg->getValue(KEYS::CHANNEL);

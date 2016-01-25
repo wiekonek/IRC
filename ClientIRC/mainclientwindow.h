@@ -27,13 +27,14 @@ public slots:
     void AddChannelTab(IRCData::ChannelData *channelData);
     void AddMessageToChannel(IRCData::MessageData *messageData);
 
-
 private slots:
     void ChannelCreatedPrompt(bool *ok);
 
     void CreateNewChannel(QString *channelName);
     void JoinChannel(QString *channelName);
-    void SendByteArray(QByteArray *array);
+    void SendByteArray(QByteArray *array);    
+    void RefreshUsers(IRCData::ChannelData *channelData);
+
 
     void on_chatWindow_tabBarClicked(int index);
     void on_button_send_clicked();

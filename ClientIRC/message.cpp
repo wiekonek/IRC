@@ -21,12 +21,40 @@ Message::Message(const char* json)
         QJsonObject container = return_json.object();
         this->container = new QJsonObject(container);
     }
+    delete(byte_array);
+    delete(json_document);
+    delete(error);
+}
+
+QString Message::getValue(QString key)
+{
+    if(container->value(key) != QJsonValue::Undefined)
+    {
+        QJsonValue answear = container->value(key);
+        return answear.toString();
+    }
+    else
+    {
+        return "";
+    }
+}
+
+QStringList Message::getList(QString key)
+{
+    QJsonArray array = container->value(key).toArray();
+    QStringList list;
+    for(auto element : array)
+    {
+        list.append(element.toString());
+    }
+    return list;
 }
 
 void Message::add(QString key, QString value)
 {
-    QJsonValue *json_value = new QJsonValue(value);
+    QJsonValue *json_value = new QJsonValue(value); //to mozna zmienic!
     container->insert(key, *json_value);
+    delete(json_value);
 }
 
 void Message::add(QString key, qint32 value)
@@ -34,17 +62,21 @@ void Message::add(QString key, qint32 value)
     add(key, QString::number(value));
 }
 
-QString Message::getValue(QString key)
+void Message::add(QString key, QStringList list)
 {
-    QJsonValue answear = container->value(key);
-    //qDebug(qPrintable(answear.toString()));
-    return answear.toString();
+    QJsonArray array;
+    for(QString element : list)
+    {
+        QJsonValue json_value(element);
+        array.append(json_value);
+    }
+    container->insert(key, array);
 }
 
 QByteArray Message::toByte()
 {
-    QJsonDocument *json_document = new QJsonDocument(*container);
-    return json_document->toJson();
+    QJsonDocument json_document(*container);
+    return json_document.toJson();
 }
 
 char* Message::toChar()
@@ -55,4 +87,12 @@ char* Message::toChar()
 void Message::printAll()
 {
     qDebug("%s", toChar());
+}
+
+void Message::printList(QString key)
+{
+    for(auto element: getList(key))
+    {
+        qDebug("%s", element.toStdString().c_str());
+    }
 }

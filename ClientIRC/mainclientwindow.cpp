@@ -24,6 +24,8 @@ MainClientWindow::MainClientWindow(Connection *connection,
             this, SLOT(AddChannelTab(IRCData::ChannelData*)));
     connect(connection, SIGNAL(OnCreateChannel(bool*)),
             this, SLOT(ChannelCreatedPrompt(bool*)));
+    connect(connection, SIGNAL(OnNewUserList(IRCData::ChannelData*)),
+            this, SLOT(RefreshUsers(IRCData::ChannelData*)));
 }
 
 MainClientWindow::~MainClientWindow()
@@ -86,6 +88,12 @@ void MainClientWindow::JoinChannel(QString *channelName)
 void MainClientWindow::SendByteArray(QByteArray *array)
 {
     connection->SendByteArray(array);
+}
+
+void MainClientWindow::RefreshUsers(IRCData::ChannelData *channelData)
+{
+    GetChannel(channelData->name)->GetChannelData() = channelData;
+    RefreshUserList(tabbedPane->currentIndex());
 }
 
 void MainClientWindow::on_chatWindow_tabBarClicked(int index)
