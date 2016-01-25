@@ -169,6 +169,7 @@ void Server::addConnection(Connection *connection)
 void Server::removeConnection()
 {
     Connection *connection = (Connection*)QObject::sender();
+    Disconnect(connection);
     Erase(active_connection, connection);
     delete(connection);
 }
