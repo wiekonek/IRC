@@ -36,6 +36,7 @@ Channel* Server::Join(Connection* connection, QString channel_name)
     {
         channel->Add(connection);
         SendConfirm(connection, JOIN_ACC, 1, channel_name);
+        SendList(channel->GetName());
     }
     else
     {
@@ -52,6 +53,7 @@ void Server::Leave(Connection* connection, QString channel_name)
     {
         channel->Remove(connection);
         SendConfirm(connection, LEAVE_ACC, 1, channel_name);
+        SendList(channel->GetName());
     }
     else
     {
@@ -100,6 +102,7 @@ void Server::Disconnect(Connection *connection)
     for(Channel* channel : public_channels)
     {
         channel->Remove(connection);
+        SendList(channel->GetName());
     }
 }
 
@@ -113,6 +116,26 @@ void Server::SendConfirm(Connection *connection, int command, int value, QString
         message->add("channel", channel_name);
     }
     connection->Send(message);
+}
+
+void Server::SendList(QString channel_name)
+{
+    Channel* channel = FindChannel(channel_name);
+    if(channel != NULL)
+    {
+        QStringList list = channel->GetList();
+        for(Connection* connection : channel->GetConnections())
+        {
+            Message* message = new Message();
+            message->add("command", USER_LIST);
+            message->add("list", list);
+            connection->Send(message);
+        }
+    }
+    else
+    {
+        qDebug("channel doesn't exists");
+    }
 }
 
 void Server::PrintPublicChannels()

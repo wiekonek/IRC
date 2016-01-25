@@ -9,13 +9,14 @@
 #define LEAVE 3
 #define MESSAGE 4
 #define DISCONNECT 5
-#define WELCOM 10
+
 
 #define LOGIN_ACC 6
 #define CREATE_ACC 7
 #define JOIN_ACC 8
 #define LEAVE_ACC 9
-
+#define WELCOM 10
+#define USER_LIST 11
 #define ERROR 20
 
 #include <vector>
@@ -43,6 +44,7 @@ public:
      void Login(Connection* connection, QString name);
      void Disconnect(Connection* connection);
      void SendConfirm(Connection* connection, int command, int value, QString channel_name = "");
+     void SendList(QString channel_name);
 
      void PrintPublicChannels();
 signals:

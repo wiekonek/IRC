@@ -21,6 +21,7 @@ public:
 
     int IsPublic();
     QString GetName();
+    QStringList GetList();
     const vector<Connection *> GetConnections();
 
     void PrintUsers();
