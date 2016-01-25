@@ -16,11 +16,14 @@ public:
     Message(const char* json);
 
     QString getValue(QString key);
+    QStringList getList(QString key);
     void add(QString key, int value);
     void add(QString key, QString value);
+    void add(QString key, QStringList list);
 
     char* toChar();
     void printAll();
+    void printList(QString key);
     QByteArray toByte();
 
 private:

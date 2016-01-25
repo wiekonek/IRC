@@ -5,6 +5,7 @@
 #include "listener.h"
 
 void messageusage();
+void listusage();
 
 int main(int argc, char *argv[])
 {
@@ -24,14 +25,8 @@ int main(int argc, char *argv[])
                      server, SLOT(addConnection(Connection*)));
     qDebug("QT signals connected.");
 
-    /*Connection* connection = new Connection();
-    connection->SetName("jacek");
-    Channel* channel = server->Create("fajny kanal");
-    server->Join("fajny kanal", connection);
-    server->PrintPublicChannels();
-    channel->PrintUsers();
-    server->Leave("fajny kanal", connection);
-    channel->PrintUsers();*/
+    listusage();
+
     return a.exec();
 }
 
@@ -55,4 +50,15 @@ void messageusage()
     //qDebug(qPrintable(value));
 }
 
+void listusage()
+{
+    Message* message = new Message();
+    QStringList list;
+    list.append("konrad");
+    list.append("jacek");
+    message->add("list", list);
+    message->add("elo", "xD");
+    message->printAll();
+    message->printList("list");
+}
 
