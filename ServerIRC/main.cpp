@@ -25,8 +25,6 @@ int main(int argc, char *argv[])
                      server, SLOT(addConnection(Connection*)));
     qDebug("QT signals connected.");
 
-    listusage();
-
     return a.exec();
 }
 

@@ -14,7 +14,7 @@ class Channel : public QObject
     Q_OBJECT
 public:
     Channel(QObject *parent = 0);
-    Channel(QString name, int ispublic = true, QString password = "");
+    Channel(QString name, QString password = "");
 
     int Add(Connection* connection, QString password = "");
     void Remove(Connection* connection);

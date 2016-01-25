@@ -45,8 +45,6 @@ void* Connection::MainLoop()
         }
         else if(recv_size > 0)
         {
-            qDebug("otrzymano");
-            qDebug(buf);
             InputManage(buf);
         }
         else if(recv_size == 0)

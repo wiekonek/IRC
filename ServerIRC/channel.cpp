@@ -5,10 +5,9 @@ Channel::Channel(QObject *parent) : QObject(parent)
 
 }
 
-Channel::Channel(QString name, int ispublic, QString password)
+Channel::Channel(QString name, QString password)
 {
     this->name = name;
-    this->ispublic = 1;
     this->password = password;
 }
 
