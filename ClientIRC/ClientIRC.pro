@@ -41,4 +41,6 @@ FORMS    += mainclientwindow.ui \
     stringpicker.ui \
     commandsender.ui
 
+QMAKE_CXXFLAGS += -std=c++0x
+
 DISTFILES +=

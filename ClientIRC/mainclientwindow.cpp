@@ -92,8 +92,11 @@ void MainClientWindow::SendByteArray(QByteArray *array)
 
 void MainClientWindow::RefreshUsers(IRCData::ChannelData *channelData)
 {
-    GetChannel(channelData->name)->GetChannelData() = channelData;
-    RefreshUserList(tabbedPane->currentIndex());
+    if(GetChannel(channelData->name) != NULL) {
+        IRCData::ChannelData *channel = GetChannel(channelData->name)->GetChannelData();
+        channel->users = channelData->users;
+        RefreshUserList(tabbedPane->currentIndex());
+    }
 }
 
 void MainClientWindow::on_chatWindow_tabBarClicked(int index)

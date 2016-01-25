@@ -130,7 +130,7 @@ void Connection::ReadyToRead()
         case USER_LIST:
         {
             IRCData::ChannelData *channelData = new IRCData::ChannelData();
-            channelData->name = msg->getList(KEYS::CHANNEL);
+            channelData->name = msg->getValue(KEYS::CHANNEL);
             channelData->users = msg->getList(KEYS::USERS);
             emit OnNewUserList(channelData);
         }
