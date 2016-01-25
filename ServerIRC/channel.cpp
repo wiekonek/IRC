@@ -44,6 +44,16 @@ QString Channel::GetName()
     return name;
 }
 
+QStringList Channel::GetList()
+{
+    QStringList list;
+    for(Connection* connection: connections)
+    {
+        list.append(connection->GetName());
+    }
+    return list;
+}
+
 const vector<Connection *> Channel::GetConnections()
 {
     return connections;
