@@ -129,6 +129,7 @@ void Server::SendList(QString channel_name)
             Message* message = new Message();
             message->add("command", USER_LIST);
             message->add("list", list);
+            message->add("channel", channel_name);
             connection->Send(message);
         }
     }
